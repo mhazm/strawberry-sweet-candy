@@ -318,6 +318,17 @@ export interface TranslationSchema {
   cancelBtn: string;
   equipFromStash: string;
   equippedSuccess: string;
+  statPresetsTitle: string;
+  selectModDropdown: string;
+  addCustomStatBtn: string;
+  customKeyOption: string;
+  modOffensiveCategory: string;
+  modDefensiveCategory: string;
+  modUtilityCategory: string;
+  pctStatNotice: string;
+  flatStatNotice: string;
+  noModifiersConfigured: string;
+  resetToTemplateStats: string;
   healthSectionTitle: string;
   conditionLabel: string;
   moraleLabel: string;

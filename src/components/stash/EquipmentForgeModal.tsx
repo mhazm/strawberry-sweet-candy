@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   X,
   Hammer,
@@ -9,6 +9,8 @@ import {
   Plus,
   Trash2,
   Info,
+  RotateCcw,
+  Zap,
 } from 'lucide-react';
 import { EquipmentItem } from '../../types/savegame';
 import {
@@ -18,13 +20,15 @@ import {
   QUALITY_BANDS,
   QualityBandId,
   RARITY_CONFIGS,
+  SUPPORTED_MODIFIERS,
+  STAT_PRESETS,
   calculateEquipmentStats,
   calculateItemValue,
-  forgeItem,
+  getModifierDefinition,
+  formatModifierDisplay,
 } from '../../lib/equipment';
 import { useTranslation } from '../../lib/i18n';
 import { Button } from '../ui/Button';
-import { Badge } from '../ui/Badge';
 import { Tooltip } from '../ui/Tooltip';
 
 interface EquipmentForgeModalProps {
@@ -51,36 +55,56 @@ export const EquipmentForgeModal: React.FC<EquipmentForgeModalProps> = ({
   const [customWeaponKind, setCustomWeaponKind] = useState<'melee' | 'ranged' | 'spell'>('melee');
   const [counterCondition, setCounterCondition] = useState<string>('none');
   const [grantsTrait, setGrantsTrait] = useState<string>('none');
-  const [customMods, setCustomMods] = useState<Array<{ key: string; value: number }>>([]);
-  const [newModKey, setNewModKey] = useState<string>('attackPct');
-  const [newModVal, setNewModVal] = useState<number>(0.2);
 
-  if (!isOpen) return null;
+  // Active editable modifiers
+  const [activeMods, setActiveMods] = useState<Record<string, number>>({});
+
+  // New modifier adding state
+  const [selectedModKey, setSelectedModKey] = useState<string>('attackPct');
+  const [customModKeyText, setCustomModKeyText] = useState<string>('');
+  const [modValInput, setModValInput] = useState<number>(0.3);
 
   const currentTemplate = EQUIPMENT_TEMPLATES.find(
     (tmpl) => tmpl.id === selectedTemplateId
   );
-
   const qualityConfig = QUALITY_BANDS[selectedBand];
   const rarityConfig = RARITY_CONFIGS[selectedRarity];
 
-  // Compute stats preview
-  let previewMods: Record<string, number> = {};
-  if (currentTemplate) {
-    previewMods = calculateEquipmentStats(
-      currentTemplate,
-      selectedRarity,
-      qualityConfig.multiplier,
-      tier
-    );
-  }
+  // Helper to re-baseline stats from current template + rarity + quality
+  const computeBaselineStats = (
+    tmpl: EquipmentTemplate,
+    rarity: ItemRarity,
+    mult: number,
+    t: number
+  ) => {
+    return calculateEquipmentStats(tmpl, rarity, mult, t);
+  };
 
-  // Merge in custom extra mods
-  customMods.forEach((cm) => {
-    if (cm.key) {
-      previewMods[cm.key] = cm.value;
+  // On template, rarity, quality, or tier change, reset or scale activeMods
+  useEffect(() => {
+    if (!isOpen) return;
+    if (currentTemplate) {
+      const baseline = computeBaselineStats(
+        currentTemplate,
+        selectedRarity,
+        qualityConfig.multiplier,
+        tier
+      );
+      setActiveMods(baseline);
     }
-  });
+  }, [selectedTemplateId, selectedRarity, selectedBand, tier, isOpen]);
+
+  // Sync mod input default value when user chooses another stat from dropdown
+  useEffect(() => {
+    if (selectedModKey === '__custom__') {
+      setModValInput(0.2);
+    } else {
+      const def = getModifierDefinition(selectedModKey);
+      setModValInput(def.defaultVal);
+    }
+  }, [selectedModKey]);
+
+  if (!isOpen) return null;
 
   const previewValue = calculateItemValue(
     selectedRarity,
@@ -105,28 +129,77 @@ export const EquipmentForgeModal: React.FC<EquipmentForgeModalProps> = ({
     }
   };
 
-  const handleAddCustomMod = () => {
-    if (!newModKey) return;
-    setCustomMods((prev) => [...prev, { key: newModKey, value: newModVal }]);
+  const handleResetBaseline = () => {
+    if (currentTemplate) {
+      const baseline = computeBaselineStats(
+        currentTemplate,
+        selectedRarity,
+        qualityConfig.multiplier,
+        tier
+      );
+      setActiveMods(baseline);
+    }
   };
 
-  const handleRemoveCustomMod = (index: number) => {
-    setCustomMods((prev) => prev.filter((_, i) => i !== index));
+  const handleApplyPreset = (presetMods: Record<string, number>) => {
+    // Apply preset with quality multiplier scaling
+    const scaled: Record<string, number> = {};
+    const mult = Math.max(0.5, qualityConfig.multiplier);
+    for (const [k, v] of Object.entries(presetMods)) {
+      const def = getModifierDefinition(k);
+      if (def.isPct) {
+        scaled[k] = Math.round(v * mult * 1000) / 1000;
+      } else {
+        scaled[k] = Math.round(v * mult);
+      }
+    }
+    setActiveMods(scaled);
+  };
+
+  const handleModValueChange = (key: string, val: number) => {
+    setActiveMods((prev) => ({
+      ...prev,
+      [key]: val,
+    }));
+  };
+
+  const handleRemoveMod = (key: string) => {
+    setActiveMods((prev) => {
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+  };
+
+  const handleAddModifier = () => {
+    const finalKey =
+      selectedModKey === '__custom__'
+        ? customModKeyText.trim()
+        : selectedModKey;
+
+    if (!finalKey) return;
+
+    setActiveMods((prev) => ({
+      ...prev,
+      [finalKey]: modValInput,
+    }));
+
+    if (selectedModKey === '__custom__') {
+      setCustomModKeyText('');
+    }
   };
 
   const handleForge = () => {
     const finalItemName =
       customName.trim() ||
-      (currentTemplate
-        ? currentTemplate.names[0]
-        : 'Forged Masterpiece');
+      (currentTemplate ? currentTemplate.names[0] : 'Forged Masterpiece');
 
     const item: EquipmentItem = {
       id: `it_forge_${Date.now()}_${Math.floor(Math.random() * 99999)}`,
       name: finalItemName,
       slot: currentTemplate ? currentTemplate.slot : customSlot,
       rarity: selectedRarity,
-      mods: { ...previewMods },
+      mods: { ...activeMods },
       tier,
       quality: qualityConfig.multiplier,
       value: previewValue,
@@ -147,6 +220,11 @@ export const EquipmentForgeModal: React.FC<EquipmentForgeModalProps> = ({
     onForge(item);
     onClose();
   };
+
+  const activeDef =
+    selectedModKey !== '__custom__'
+      ? getModifierDefinition(selectedModKey)
+      : null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
@@ -246,7 +324,7 @@ export const EquipmentForgeModal: React.FC<EquipmentForgeModalProps> = ({
             </select>
           </div>
 
-          {/* Row 2: Item Name & Slot */}
+          {/* Row 2: Item Name & Tier */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="md:col-span-2 space-y-1">
               <label className="text-[11px] font-semibold text-[#8e8273]">
@@ -397,86 +475,204 @@ export const EquipmentForgeModal: React.FC<EquipmentForgeModalProps> = ({
             </div>
           </div>
 
-          {/* Row 6: Live Stats Computed Preview */}
-          <div className="p-3.5 rounded-xl bg-[#17131d] border border-[#2e2338] space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#dfb15b] flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5" />
-                {t.previewAffixes}
-              </span>
-              <span className="text-[11px] font-mono text-[#f5cb71] font-bold">
-                Value: {previewValue.toLocaleString()}g
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {Object.entries(previewMods).map(([stat, val]) => (
-                <div
-                  key={stat}
-                  className="px-2.5 py-1.5 rounded-lg bg-[#110e16] border border-[#271f30] flex items-center justify-between font-mono text-xs"
+          {/* Row 6: Interactive Combat Modifiers Section */}
+          <div className="p-4 rounded-xl bg-[#17131d] border border-[#2e2338] space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#271f30] pb-2.5">
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#dfb15b] flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  {t.previewAffixes}
+                </span>
+                <span className="text-[10px] text-[#8e8273]">
+                  Directly customize numbers or pick from recommended presets below.
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-[10px] px-2 py-0.5 text-[#8e8273] hover:text-[#f0e8db]"
+                  icon={<RotateCcw className="w-3 h-3" />}
+                  onClick={handleResetBaseline}
+                  title={t.resetToTemplateStats}
                 >
-                  <span className="text-[#a89c8a]">{stat}:</span>
-                  <span
-                    className={`font-bold ${
-                      val >= 0 ? 'text-[#71caa2]' : 'text-[#e67e8c]'
-                    }`}
-                  >
-                    {typeof val === 'number' && Math.abs(val) <= 1
-                      ? `${val >= 0 ? '+' : ''}${(val * 100).toFixed(1)}%`
-                      : `${val >= 0 ? '+' : ''}${val}`}
-                  </span>
-                </div>
-              ))}
+                  {t.resetToTemplateStats}
+                </Button>
+                <span className="text-[11px] font-mono text-[#f5cb71] font-bold bg-[#110e16] px-2.5 py-1 rounded border border-[#271f30]">
+                  {t.goldValue}: {previewValue.toLocaleString()}g
+                </span>
+              </div>
             </div>
 
-            {/* Custom Mod Line Adder */}
-            <div className="pt-2 border-t border-[#271f30] flex items-center gap-2 flex-wrap">
-              <input
-                type="text"
-                placeholder="Custom mod key (e.g. speed)"
-                value={newModKey}
-                onChange={(e) => setNewModKey(e.target.value)}
-                className="w-36 bg-[#110e16] border border-[#382b45] rounded px-2 py-1 text-xs text-[#f0e8db] font-mono focus:outline-none"
-              />
-              <input
-                type="number"
-                step="0.01"
-                placeholder="Value"
-                value={newModVal}
-                onChange={(e) => setNewModVal(parseFloat(e.target.value) || 0)}
-                className="w-20 bg-[#110e16] border border-[#382b45] rounded px-2 py-1 text-xs text-[#71caa2] font-mono font-bold focus:outline-none"
-              />
-              <Button
-                variant="secondary"
-                size="sm"
-                className="text-xs px-2.5 py-1"
-                icon={<Plus className="w-3 h-3" />}
-                onClick={handleAddCustomMod}
-              >
-                {t.addModLine}
-              </Button>
-            </div>
-
-            {/* Added custom mods list */}
-            {customMods.length > 0 && (
-              <div className="flex items-center gap-2 flex-wrap pt-1">
-                {customMods.map((cm, idx) => (
-                  <span
-                    key={idx}
-                    className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#201827] text-[#c9bea9] border border-[#3b2e47] text-[11px] font-mono"
-                  >
-                    <span>{cm.key}: {cm.value}</span>
+            {/* Quick Stat Presets */}
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-bold uppercase text-[#695d4e] flex items-center gap-1">
+                <Zap className="w-3 h-3 text-[#dfb15b]" />
+                {t.statPresetsTitle}
+              </span>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {STAT_PRESETS.map((preset) => (
+                  <Tooltip key={preset.id} content={preset.description}>
                     <button
                       type="button"
-                      onClick={() => handleRemoveCustomMod(idx)}
-                      className="text-[#e67e8c] hover:text-red-400"
+                      onClick={() => handleApplyPreset(preset.mods)}
+                      className="px-2.5 py-1 rounded-lg border border-[#3b2e47] bg-[#1d1626] hover:bg-[#2b1f38] hover:border-[#dfb15b] text-[#f0e8db] text-[11px] font-medium flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
                     >
-                      <X className="w-3 h-3" />
+                      <span>{preset.icon}</span>
+                      <span>{preset.label}</span>
                     </button>
-                  </span>
+                  </Tooltip>
                 ))}
               </div>
+            </div>
+
+            {/* Active Modifiers Editable List */}
+            {Object.keys(activeMods).length === 0 ? (
+              <div className="p-4 text-center rounded-lg bg-[#110e16] border border-dashed border-[#2e2338] text-xs text-[#8e8273]">
+                {t.noModifiersConfigured}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {Object.entries(activeMods).map(([statKey, val]) => {
+                  const def = getModifierDefinition(statKey);
+                  return (
+                    <div
+                      key={statKey}
+                      className="p-2.5 rounded-lg bg-[#110e16] border border-[#271f30] flex items-center justify-between gap-3 group hover:border-[#3d2e4c] transition-all"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5 truncate">
+                          <span className="text-[#f0e8db] font-semibold text-xs truncate">
+                            {def.name}
+                          </span>
+                          <span className="text-[9px] font-mono text-[#695d4e] px-1 rounded bg-[#18131f] border border-[#261f2e]">
+                            {statKey}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-[#7a6f60] truncate" title={def.description}>
+                          {def.description}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="number"
+                            step={def.isPct ? 0.01 : 1}
+                            value={val}
+                            onChange={(e) =>
+                              handleModValueChange(
+                                statKey,
+                                parseFloat(e.target.value) || 0
+                              )
+                            }
+                            className={`w-20 bg-[#18131f] border border-[#382b45] rounded px-2 py-1 text-right font-mono font-bold text-xs focus:outline-none focus:border-[#dfb15b] ${
+                              val >= 0 ? 'text-[#71caa2]' : 'text-[#e67e8c]'
+                            }`}
+                          />
+                          <span className="text-[10px] font-mono font-bold text-[#dfb15b] w-12 text-right">
+                            {formatModifierDisplay(statKey, val)}
+                          </span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveMod(statKey)}
+                          className="p-1 text-[#e67e8c] hover:text-red-400 hover:bg-[#2b1720] rounded transition-colors"
+                          title="Remove stat"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             )}
+
+            {/* Add New Modifier Bar */}
+            <div className="pt-3 border-t border-[#271f30] space-y-2">
+              <span className="text-[10px] font-bold uppercase text-[#695d4e] block">
+                {t.addModLine}
+              </span>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                {/* Dropdown with all supported stats */}
+                <select
+                  value={selectedModKey}
+                  onChange={(e) => setSelectedModKey(e.target.value)}
+                  className="flex-1 bg-[#110e16] border border-[#382b45] rounded-lg px-2.5 py-1.5 text-xs text-[#f0e8db] font-medium focus:outline-none focus:border-[#dfb15b]"
+                >
+                  <optgroup label="⚔️ Offensive Stats">
+                    {SUPPORTED_MODIFIERS.filter((m) => m.category === 'offensive').map((m) => (
+                      <option key={m.key} value={m.key}>
+                        {m.name} ({m.key}) — {m.isPct ? '+%' : '+Flat'}
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="🛡️ Defensive Stats">
+                    {SUPPORTED_MODIFIERS.filter((m) => m.category === 'defensive').map((m) => (
+                      <option key={m.key} value={m.key}>
+                        {m.name} ({m.key}) — {m.isPct ? '+%' : '+Flat'}
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="🌿 Support & Utility">
+                    {SUPPORTED_MODIFIERS.filter((m) => m.category === 'utility').map((m) => (
+                      <option key={m.key} value={m.key}>
+                        {m.name} ({m.key}) — {m.isPct ? '+%' : '+Flat'}
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="⚙️ Custom Key">
+                    <option value="__custom__">
+                      {t.customKeyOption}
+                    </option>
+                  </optgroup>
+                </select>
+
+                {/* If custom selected, text input */}
+                {selectedModKey === '__custom__' && (
+                  <input
+                    type="text"
+                    placeholder="e.g. luck or threatMult"
+                    value={customModKeyText}
+                    onChange={(e) => setCustomModKeyText(e.target.value)}
+                    className="w-40 bg-[#110e16] border border-[#382b45] rounded-lg px-2.5 py-1.5 text-xs text-[#f0e8db] font-mono focus:outline-none"
+                  />
+                )}
+
+                {/* Value input */}
+                <div className="relative w-28 shrink-0">
+                  <input
+                    type="number"
+                    step={activeDef ? (activeDef.isPct ? 0.01 : 1) : 0.05}
+                    value={modValInput}
+                    onChange={(e) => setModValInput(parseFloat(e.target.value) || 0)}
+                    className="w-full bg-[#110e16] border border-[#382b45] rounded-lg px-2.5 py-1.5 text-xs text-[#71caa2] font-mono font-bold focus:outline-none"
+                  />
+                  <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-[#8e8273] font-mono">
+                    {activeDef ? (activeDef.isPct ? '%' : 'flat') : ''}
+                  </span>
+                </div>
+
+                <Button
+                  variant="gold"
+                  size="sm"
+                  className="text-xs px-3 py-1.5 whitespace-nowrap"
+                  icon={<Plus className="w-3.5 h-3.5 text-[#151218]" />}
+                  onClick={handleAddModifier}
+                >
+                  {t.addCustomStatBtn}
+                </Button>
+              </div>
+
+              {/* Helper explanation for selected stat */}
+              {activeDef && (
+                <p className="text-[10px] text-[#7e7261]">
+                  💡 <span className="text-[#c9bea9] font-medium">{activeDef.name}</span>: {activeDef.description} ({activeDef.isPct ? t.pctStatNotice : t.flatStatNotice})
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
@@ -498,4 +694,3 @@ export const EquipmentForgeModal: React.FC<EquipmentForgeModalProps> = ({
     </div>
   );
 };
-

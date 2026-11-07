@@ -27,6 +27,8 @@ import {
   forgeConditionCounterPack,
   forgeItem,
   getQualityBandFromMultiplier,
+  getModifierDefinition,
+  formatModifierDisplay,
 } from '../../lib/equipment';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -475,22 +477,25 @@ export const StashEditor: React.FC<StashEditorProps> = ({ guild, onChange }) => 
                       <span className="text-[10px] uppercase font-bold text-[#695d4e] block font-sans">
                         {t.affixMods}
                       </span>
-                      {Object.entries(item.mods).map(([k, v]) => (
-                        <div key={k} className="flex justify-between text-[#b8ab96]">
-                          <span>{k}:</span>
-                          <span
-                            className={`font-bold ${
-                              typeof v === 'number' && v < 0
-                                ? 'text-[#e67e8c]'
-                                : 'text-[#71caa2]'
-                            }`}
-                          >
-                            {typeof v === 'number' && Math.abs(v) <= 1 && k !== 'accuracy'
-                              ? `${v >= 0 ? '+' : ''}${(v * 100).toFixed(1)}%`
-                              : `${v >= 0 ? '+' : ''}${v}`}
-                          </span>
-                        </div>
-                      ))}
+                      {Object.entries(item.mods).map(([k, v]) => {
+                        const def = getModifierDefinition(k);
+                        return (
+                          <div key={k} className="flex justify-between items-center text-[#b8ab96]">
+                            <span title={def.description} className="text-[#c9bea9] font-sans truncate mr-2">
+                              {def.name} <span className="text-[10px] text-[#695d4e] font-mono">({k})</span>
+                            </span>
+                            <span
+                              className={`font-bold font-mono shrink-0 ${
+                                typeof v === 'number' && v < 0
+                                  ? 'text-[#e67e8c]'
+                                  : 'text-[#71caa2]'
+                              }`}
+                            >
+                              {formatModifierDisplay(k, v)}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>

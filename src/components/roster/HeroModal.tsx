@@ -48,9 +48,12 @@ import {
   EQUIPMENT_TEMPLATES,
   QUALITY_BANDS,
   RARITY_CONFIGS,
+  SUPPORTED_MODIFIERS,
   getQualityBandFromMultiplier,
   calculateEquipmentStats,
   calculateItemValue,
+  getModifierDefinition,
+  formatModifierDisplay,
 } from '../../lib/equipment';
 
 interface HeroModalProps {
@@ -1237,36 +1240,117 @@ export const HeroModal: React.FC<HeroModalProps> = ({
                               </div>
                             </div>
 
-                            {/* Affixes / Mods */}
-                            <div className="pt-2 border-t border-[#2d2333] space-y-1.5">
+                            {/* Affixes / Combat Modifiers */}
+                            <div className="pt-2 border-t border-[#2d2333] space-y-2">
                               <span className="text-[10px] font-semibold text-[#8e8273] uppercase block">
                                 {t.affixMods}
                               </span>
                               {item.mods &&
-                                Object.entries(item.mods).map(([k, v]) => (
-                                  <div
-                                    key={k}
-                                    className="flex items-center justify-between text-[11px] font-mono"
-                                  >
-                                    <span className="text-[#71caa2]">+{k}:</span>
-                                    <input
-                                      type="number"
-                                      step="0.01"
-                                      value={v}
-                                      onChange={(e) => {
-                                        const parsed = parseFloat(e.target.value) || 0;
-                                        updateEquipment(slot, {
-                                          ...item,
-                                          mods: {
-                                            ...item.mods,
-                                            [k]: parsed,
-                                          },
-                                        });
-                                      }}
-                                      className="w-16 bg-[#131018] border border-[#3b2e44] rounded px-1.5 py-0.5 text-right text-[#71caa2] font-bold focus:outline-none"
-                                    />
-                                  </div>
-                                ))}
+                                Object.entries(item.mods).map(([k, v]) => {
+                                  const def = getModifierDefinition(k);
+                                  return (
+                                    <div
+                                      key={k}
+                                      className="p-1.5 rounded bg-[#131018] border border-[#271f30] flex items-center justify-between gap-1.5"
+                                    >
+                                      <div className="min-w-0 flex-1 truncate">
+                                        <div className="flex items-center gap-1 truncate">
+                                          <span className="text-[#f0e8db] font-semibold text-[11px] truncate">
+                                            {def.name}
+                                          </span>
+                                          <span className="text-[9px] font-mono text-[#695d4e]">
+                                            ({k})
+                                          </span>
+                                        </div>
+                                      </div>
+
+                                      <div className="flex items-center gap-1.5 shrink-0">
+                                        <input
+                                          type="number"
+                                          step={def.isPct ? 0.01 : 1}
+                                          value={v}
+                                          onChange={(e) => {
+                                            const parsed = parseFloat(e.target.value) || 0;
+                                            updateEquipment(slot, {
+                                              ...item,
+                                              mods: {
+                                                ...item.mods,
+                                                [k]: parsed,
+                                              },
+                                            });
+                                          }}
+                                          className={`w-16 bg-[#18131f] border border-[#3b2e44] rounded px-1.5 py-0.5 text-right font-mono font-bold text-[11px] focus:outline-none focus:border-[#dfb15b] ${
+                                            v >= 0 ? 'text-[#71caa2]' : 'text-[#e67e8c]'
+                                          }`}
+                                        />
+                                        <span className="text-[10px] font-mono font-bold text-[#dfb15b] w-10 text-right">
+                                          {formatModifierDisplay(k, v)}
+                                        </span>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            const nextMods = { ...(item.mods || {}) };
+                                            delete nextMods[k];
+                                            updateEquipment(slot, {
+                                              ...item,
+                                              mods: nextMods,
+                                            });
+                                          }}
+                                          className="text-[#e67e8c] hover:text-red-400 p-0.5"
+                                          title="Remove stat"
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+
+                              {/* Quick Stat Add Selector for hero */}
+                              <div className="pt-1 flex items-center gap-1.5">
+                                <select
+                                  defaultValue=""
+                                  onChange={(e) => {
+                                    const key = e.target.value;
+                                    if (!key) return;
+                                    const def = getModifierDefinition(key);
+                                    updateEquipment(slot, {
+                                      ...item,
+                                      mods: {
+                                        ...(item.mods || {}),
+                                        [key]: def.defaultVal,
+                                      },
+                                    });
+                                    e.target.value = '';
+                                  }}
+                                  className="w-full bg-[#131018] border border-[#3b2e44] rounded px-2 py-1 text-[11px] text-[#dfb15b] focus:outline-none"
+                                >
+                                  <option value="" disabled>
+                                    + {t.selectModDropdown}
+                                  </option>
+                                  <optgroup label="⚔️ Offensive Stats">
+                                    {SUPPORTED_MODIFIERS.filter((m) => m.category === 'offensive').map((m) => (
+                                      <option key={m.key} value={m.key}>
+                                        {m.name} ({m.key}) — {m.isPct ? '+%' : '+Flat'}
+                                      </option>
+                                    ))}
+                                  </optgroup>
+                                  <optgroup label="🛡️ Defensive Stats">
+                                    {SUPPORTED_MODIFIERS.filter((m) => m.category === 'defensive').map((m) => (
+                                      <option key={m.key} value={m.key}>
+                                        {m.name} ({m.key}) — {m.isPct ? '+%' : '+Flat'}
+                                      </option>
+                                    ))}
+                                  </optgroup>
+                                  <optgroup label="🌿 Support & Utility">
+                                    {SUPPORTED_MODIFIERS.filter((m) => m.category === 'utility').map((m) => (
+                                      <option key={m.key} value={m.key}>
+                                        {m.name} ({m.key}) — {m.isPct ? '+%' : '+Flat'}
+                                      </option>
+                                    ))}
+                                  </optgroup>
+                                </select>
+                              </div>
                             </div>
                           </div>
                         )}

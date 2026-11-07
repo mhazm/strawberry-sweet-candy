@@ -875,3 +875,276 @@ export function forgeConditionCounterPack(): EquipmentItem[] {
   ];
 }
 
+// ==================== STAT / MODIFIER REGISTRY & PRESETS ====================
+
+export interface ModifierDefinition {
+  key: string;
+  name: string;
+  category: 'offensive' | 'defensive' | 'utility';
+  isPct: boolean;
+  defaultVal: number;
+  step: number;
+  min: number;
+  max: number;
+  description: string;
+}
+
+export const SUPPORTED_MODIFIERS: ModifierDefinition[] = [
+  // Offensive
+  {
+    key: 'attackPct',
+    name: 'Attack Power (%)',
+    category: 'offensive',
+    isPct: true,
+    defaultVal: 0.30,
+    step: 0.05,
+    min: -1.0,
+    max: 2.5,
+    description: 'Increases all direct physical, ranged, and spell damage dealt.',
+  },
+  {
+    key: 'critChance',
+    name: 'Critical Strike Chance (%)',
+    category: 'offensive',
+    isPct: true,
+    defaultVal: 0.10,
+    step: 0.01,
+    min: -0.5,
+    max: 1.0,
+    description: 'Probability of landing a devastating critical strike in combat.',
+  },
+  {
+    key: 'critDamage',
+    name: 'Critical Hit Damage (%)',
+    category: 'offensive',
+    isPct: true,
+    defaultVal: 0.35,
+    step: 0.05,
+    min: 0,
+    max: 3.0,
+    description: 'Bonus damage multiplier applied when landing a critical blow.',
+  },
+  {
+    key: 'accuracy',
+    name: 'Hit Accuracy',
+    category: 'offensive',
+    isPct: false,
+    defaultVal: 5,
+    step: 1,
+    min: -20,
+    max: 50,
+    description: 'Flat bonus to overcome enemy Evasion and Pitch Dark visibility penalties.',
+  },
+  // Defensive
+  {
+    key: 'hpPct',
+    name: 'Max Hit Points (%)',
+    category: 'defensive',
+    isPct: true,
+    defaultVal: 0.25,
+    step: 0.05,
+    min: -1.0,
+    max: 3.0,
+    description: 'Percentage multiplier applied to adventurer total health pool.',
+  },
+  {
+    key: 'mitigation',
+    name: 'Damage Mitigation (%)',
+    category: 'defensive',
+    isPct: true,
+    defaultVal: 0.15,
+    step: 0.02,
+    min: -0.5,
+    max: 1.0,
+    description: 'Direct percentage reduction of all incoming physical and spell damage.',
+  },
+  {
+    key: 'blockChance',
+    name: 'Block Chance (%)',
+    category: 'defensive',
+    isPct: true,
+    defaultVal: 0.15,
+    step: 0.02,
+    min: 0,
+    max: 1.0,
+    description: 'Probability of using a shield or weapon guard to deflect attacks.',
+  },
+  {
+    key: 'healTakenPct',
+    name: 'Healing Received (%)',
+    category: 'defensive',
+    isPct: true,
+    defaultVal: 0.25,
+    step: 0.05,
+    min: -1.0,
+    max: 2.5,
+    description: 'Amplifies all health restored by party healers, potions, and food.',
+  },
+  // Utility & Support
+  {
+    key: 'healPct',
+    name: 'Healing Done (%)',
+    category: 'utility',
+    isPct: true,
+    defaultVal: 0.25,
+    step: 0.05,
+    min: -1.0,
+    max: 2.5,
+    description: 'Direct potency boost to restoration spells and bandaging skills.',
+  },
+  {
+    key: 'speed',
+    name: 'Combat Speed',
+    category: 'utility',
+    isPct: false,
+    defaultVal: 4,
+    step: 1,
+    min: -10,
+    max: 30,
+    description: 'Determines delve initiative and turn order in dungeon encounters.',
+  },
+  {
+    key: 'support',
+    name: 'Support Power',
+    category: 'utility',
+    isPct: false,
+    defaultVal: 5,
+    step: 1,
+    min: 0,
+    max: 30,
+    description: 'Enhances team morale boosts, inspiration buffs, and tactical auras.',
+  },
+  {
+    key: 'crowdControl',
+    name: 'Crowd Control',
+    category: 'utility',
+    isPct: false,
+    defaultVal: 5,
+    step: 1,
+    min: 0,
+    max: 30,
+    description: 'Increases stun duration, pin chances, and monster disorientation.',
+  },
+  {
+    key: 'evasion',
+    name: 'Evasion & Dodge',
+    category: 'defensive',
+    isPct: false,
+    defaultVal: 5,
+    step: 1,
+    min: 0,
+    max: 30,
+    description: 'Flat bonus to dodge monster strikes and avoid dungeon trap triggers.',
+  },
+];
+
+export function getModifierDefinition(key: string): ModifierDefinition {
+  const found = SUPPORTED_MODIFIERS.find((m) => m.key === key);
+  if (found) return found;
+
+  const isPct =
+    key.toLowerCase().endsWith('pct') ||
+    key.toLowerCase().includes('chance') ||
+    key === 'mitigation';
+
+  return {
+    key,
+    name: key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase()),
+    category: 'utility',
+    isPct,
+    defaultVal: isPct ? 0.2 : 5,
+    step: isPct ? 0.05 : 1,
+    min: isPct ? -1.0 : 0,
+    max: isPct ? 3.0 : 50,
+    description: 'Custom combat modifier parameter.',
+  };
+}
+
+export function formatModifierDisplay(key: string, val: number): string {
+  const def = getModifierDefinition(key);
+  if (def.isPct) {
+    const sign = val >= 0 ? '+' : '';
+    return `${sign}${(val * 100).toFixed(1)}%`;
+  }
+  const sign = val >= 0 ? '+' : '';
+  return `${sign}${val}`;
+}
+
+export interface StatPreset {
+  id: string;
+  label: string;
+  icon: string;
+  category: string;
+  description: string;
+  mods: Record<string, number>;
+}
+
+export const STAT_PRESETS: StatPreset[] = [
+  {
+    id: 'dps',
+    label: 'Striker / DPS',
+    icon: '⚔️',
+    category: 'offensive',
+    description: 'Heavy attack power, crit strike chance, and high accuracy for damage dealers.',
+    mods: {
+      attackPct: 0.39,
+      critChance: 0.12,
+      critDamage: 0.35,
+      accuracy: 6,
+    },
+  },
+  {
+    id: 'tank',
+    label: 'Bulwark / Tank',
+    icon: '🛡️',
+    category: 'defensive',
+    description: 'Maximized Hit Points, damage mitigation, block chance, and healing received.',
+    mods: {
+      hpPct: 0.30,
+      mitigation: 0.20,
+      blockChance: 0.20,
+      healTakenPct: 0.30,
+    },
+  },
+  {
+    id: 'healer',
+    label: 'Restorer / Healer',
+    icon: '🌿',
+    category: 'utility',
+    description: 'Empowered healing done, survivability health pool, and spell accuracy.',
+    mods: {
+      healPct: 0.30,
+      hpPct: 0.20,
+      healTakenPct: 0.25,
+      accuracy: 4,
+    },
+  },
+  {
+    id: 'assassin',
+    label: 'Swift Assassin',
+    icon: '⚡',
+    category: 'offensive',
+    description: 'High initiative speed, critical chance, and armor-piercing accuracy.',
+    mods: {
+      attackPct: 0.35,
+      critChance: 0.18,
+      speed: 6,
+      accuracy: 7,
+    },
+  },
+  {
+    id: 'godroll',
+    label: 'Sovereign God-Roll',
+    icon: '👑',
+    category: 'special',
+    description: 'Pinnacle combination of maximum damage, HP, and damage mitigation.',
+    mods: {
+      attackPct: 0.50,
+      hpPct: 0.40,
+      mitigation: 0.25,
+      critChance: 0.15,
+      accuracy: 8,
+    },
+  },
+];
+
