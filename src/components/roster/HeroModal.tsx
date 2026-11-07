@@ -16,6 +16,7 @@ import {
   Star,
   Package,
   Dices,
+  AlertTriangle,
 } from 'lucide-react';
 import { Adventurer, EquipmentItem } from '../../types/savegame';
 import {
@@ -30,6 +31,12 @@ import {
   getStatLabel,
   getStatDesc,
 } from '../../lib/constants';
+import {
+  getRoleForDelver,
+  isTraitRecommendedForRole,
+  isTraitHarmfulForRole,
+  getOptimalPresetForRole,
+} from '../../lib/roleTraits';
 import { rollWonderkidGacha } from '../../lib/wonderkid';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -82,11 +89,27 @@ export const HeroModal: React.FC<HeroModalProps> = ({
   >(initialTab);
 
   const [traitSearch, setTraitSearch] = useState('');
-  const [traitFilter, setTraitFilter] = useState<'all' | 'positive' | 'negative' | 'neutral'>('all');
+  const [traitFilter, setTraitFilter] = useState<'all' | 'recommended' | 'positive' | 'negative' | 'neutral'>('all');
   const [statCatFilter, setStatCatFilter] = useState<'all' | 'combat' | 'mental' | 'physical' | 'role'>('all');
   const [customTrait, setCustomTrait] = useState('');
   const [gachaRollCount, setGachaRollCount] = useState(0);
   const [lastGachaMessage, setLastGachaMessage] = useState<string | null>(null);
+
+  // Resolved role for hero
+  const heroRole = getRoleForDelver(form.classId, form.role);
+
+  // Apply optimal role traits preset
+  const handleApplyOptimalRoleTraits = () => {
+    const preset = getOptimalPresetForRole(heroRole);
+    const existing = form.traitIds || [];
+    // Filter out counterproductive flaws
+    const filteredExisting = existing.filter((tid) => !isTraitHarmfulForRole(tid, heroRole));
+    const combined = Array.from(new Set([...filteredExisting, ...preset]));
+    setForm((prev) => ({
+      ...prev,
+      traitIds: combined,
+    }));
+  };
 
   // Wonderkid Gacha System: Job-optimized stats, explosive growth & high PA
   const handleGachaWonderkid = () => {
@@ -284,7 +307,14 @@ export const HeroModal: React.FC<HeroModalProps> = ({
       traitItem.desc.toLowerCase().includes(searchLower) ||
       behaviorKeys.includes(searchLower) ||
       tagLower.includes(searchLower);
-    const matchesFilter = traitFilter === 'all' || traitItem.type === traitFilter;
+
+    let matchesFilter = true;
+    if (traitFilter === 'recommended') {
+      matchesFilter = isTraitRecommendedForRole(traitItem.id, heroRole);
+    } else if (traitFilter !== 'all') {
+      matchesFilter = traitItem.type === traitFilter;
+    }
+
     return matchesSearch && matchesFilter;
   });
 
@@ -691,18 +721,28 @@ export const HeroModal: React.FC<HeroModalProps> = ({
             <div className="space-y-5">
               {/* Currently Equipped Traits */}
               <div className="p-4 bg-[#1b1723] border border-[#312739] rounded-xl space-y-2.5">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-wrap gap-2">
                   <span className="text-xs font-semibold uppercase text-[#c9bea9]">
                     {t.equippedTraits} ({form.traitIds?.length || 0})
                   </span>
-                  {form.traitIds?.length > 0 && (
+                  <div className="flex items-center gap-3">
                     <button
-                      onClick={() => setForm({ ...form, traitIds: [] })}
-                      className="text-[11px] text-[#e67e8c] hover:underline cursor-pointer"
+                      onClick={handleApplyOptimalRoleTraits}
+                      className="text-[11px] text-[#dfb15b] hover:text-[#f5cb71] hover:underline cursor-pointer flex items-center gap-1 font-semibold transition-colors"
+                      title={t.btnApplyRoleTraits}
                     >
-                      {t.clearAllTraits}
+                      <Sparkles className="w-3.5 h-3.5 text-[#dfb15b]" />
+                      <span>{t.btnApplyRoleTraits}</span>
                     </button>
-                  )}
+                    {form.traitIds?.length > 0 && (
+                      <button
+                        onClick={() => setForm({ ...form, traitIds: [] })}
+                        className="text-[11px] text-[#e67e8c] hover:underline cursor-pointer"
+                      >
+                        {t.clearAllTraits}
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex flex-wrap gap-2 min-h-[36px]">
@@ -756,6 +796,34 @@ export const HeroModal: React.FC<HeroModalProps> = ({
                     })
                   )}
                 </div>
+
+                {/* Harmful flaws warning for this hero's role */}
+                {(() => {
+                  const harmfulEquipped = (form.traitIds || []).filter((tid) => isTraitHarmfulForRole(tid, heroRole));
+                  if (harmfulEquipped.length === 0) return null;
+                  return (
+                    <div className="mt-3 p-2.5 rounded-lg bg-[#30161a] border border-[#ef4444]/40 flex items-center justify-between gap-3 text-xs text-[#f87171]">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4 text-[#ef4444] shrink-0" />
+                        <div>
+                          <span className="font-bold">{t.warningHarmfulTrait}: </span>
+                          <span className="underline">{harmfulEquipped.map((tid) => getTraitName(tid)).join(', ')}</span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() =>
+                          setForm((prev) => ({
+                            ...prev,
+                            traitIds: (prev.traitIds || []).filter((tid) => !harmfulEquipped.includes(tid)),
+                          }))
+                        }
+                        className="px-2 py-0.5 rounded bg-[#ef4444]/20 border border-[#ef4444]/50 text-[10px] text-white hover:bg-[#ef4444]/30 font-semibold cursor-pointer shrink-0 transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Trait Catalog Search & Filter */}
@@ -772,27 +840,34 @@ export const HeroModal: React.FC<HeroModalProps> = ({
                     />
                   </div>
 
-                  <div className="flex items-center gap-1.5 text-xs">
-                    {(['all', 'positive', 'negative', 'neutral'] as const).map((type) => {
+                  <div className="flex items-center gap-1.5 text-xs flex-wrap">
+                    {(['all', 'recommended', 'positive', 'negative', 'neutral'] as const).map((type) => {
                       const label =
                         type === 'all'
                           ? t.filterAll
+                          : type === 'recommended'
+                          ? t.filterRoleRecommended
                           : type === 'positive'
                           ? t.filterPositive
                           : type === 'negative'
                           ? t.filterNegative
                           : t.filterNeutral;
+
+                      const isSelected = traitFilter === type;
                       return (
                         <button
                           key={type}
                           onClick={() => setTraitFilter(type)}
-                          className={`px-2.5 py-1 rounded-md text-[11px] font-semibold uppercase cursor-pointer transition-colors ${
-                            traitFilter === type
-                              ? 'bg-[#2d2214] text-[#dfb15b] border border-[#594426]'
+                          className={`px-2.5 py-1 rounded-md text-[11px] font-semibold uppercase cursor-pointer transition-colors flex items-center gap-1 ${
+                            isSelected
+                              ? type === 'recommended'
+                                ? 'bg-[#dfb15b] text-[#141018] font-bold shadow'
+                                : 'bg-[#2d2214] text-[#dfb15b] border border-[#594426]'
                               : 'bg-[#201a14] text-[#8e8273] hover:text-[#c9bea9]'
                           }`}
                         >
-                          {label}
+                          {type === 'recommended' && <Star className={`w-3 h-3 ${isSelected ? 'fill-current' : 'text-[#dfb15b]'}`} />}
+                          <span>{label}</span>
                         </button>
                       );
                     })}
@@ -803,6 +878,8 @@ export const HeroModal: React.FC<HeroModalProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-80 overflow-y-auto pr-1">
                   {filteredCatalog.map((traitItem) => {
                     const isEquipped = form.traitIds?.includes(traitItem.id);
+                    const isRecommended = isTraitRecommendedForRole(traitItem.id, heroRole);
+                    const isHarmful = isTraitHarmfulForRole(traitItem.id, heroRole);
                     const traitName = getTraitName(traitItem.id, traitItem.name);
                     const traitDesc = getTraitDesc(traitItem.id, traitItem.desc);
                     let borderClass = 'border-[#2d2333] hover:border-[#473850] bg-[#1a1622]';
@@ -816,6 +893,8 @@ export const HeroModal: React.FC<HeroModalProps> = ({
 
                     if (isEquipped) {
                       borderClass = 'border-[#dfb15b]/60 bg-[#2d2214] shadow-sm';
+                    } else if (isRecommended) {
+                      borderClass = 'border-[#dfb15b]/30 hover:border-[#dfb15b]/60 bg-[#1e1925]';
                     }
 
                     return (
@@ -830,6 +909,18 @@ export const HeroModal: React.FC<HeroModalProps> = ({
                               {traitName}
                             </span>
                             <div className="flex items-center gap-1 shrink-0">
+                              {isRecommended && (
+                                <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#dfb15b]/20 text-[#dfb15b] border border-[#dfb15b]/40 font-semibold flex items-center gap-0.5">
+                                  <Star className="w-2.5 h-2.5 fill-current" />
+                                  <span>{t.badgeRoleRecommended}</span>
+                                </span>
+                              )}
+                              {isHarmful && (
+                                <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#ef4444]/20 text-[#f87171] border border-[#ef4444]/40 font-semibold flex items-center gap-0.5">
+                                  <AlertTriangle className="w-2.5 h-2.5" />
+                                  <span>{t.warningHarmfulTrait}</span>
+                                </span>
+                              )}
                               {traitItem.tag && (
                                 <span className="text-[9px] px-1 py-0.2 rounded bg-[#2a2233] text-[#c2b6cb] font-mono">
                                   {traitItem.tag}

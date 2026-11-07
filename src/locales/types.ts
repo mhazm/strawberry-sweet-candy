@@ -232,9 +232,13 @@ export interface TranslationSchema {
   unequipTrait: string;
   searchTraits: string;
   filterAll: string;
+  filterRoleRecommended: string;
   filterPositive: string;
   filterNegative: string;
   filterNeutral: string;
+  btnApplyRoleTraits: string;
+  badgeRoleRecommended: string;
+  warningHarmfulTrait: string;
   gearModifiers: string;
   addModifier: string;
   race: string;
