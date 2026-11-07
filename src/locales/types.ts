@@ -38,9 +38,29 @@ export interface TranslationSchema {
   navRecruits: string;
   navFallen: string;
   navArmoury: string;
+  navSynergy: string;
   navGuildOverview: string;
   navQuickCheats: string;
   navSettings: string;
+
+  // Party Synergy Planner
+  synergyTitle: string;
+  synergySubtitle: string;
+  synergyActiveParty: string;
+  synergyEmptyParty: string;
+  synergyTotalBonuses: string;
+  synergyDamage: string;
+  synergyHealing: string;
+  synergyMitigation: string;
+  synergyActiveList: string;
+  synergyInactiveList: string;
+  synergyAvailableRoster: string;
+  synergyRecommendedTitle: string;
+  synergyRecommendedSubtitle: string;
+  synergyApplyParty: string;
+  synergyClearParty: string;
+  synergySlotsUsed: string;
+  synergyNoSynergyFound: string;
 
   // Roster View & Table
   rosterTitle: string;

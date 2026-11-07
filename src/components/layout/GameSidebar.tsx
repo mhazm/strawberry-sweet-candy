@@ -8,6 +8,7 @@ import {
   Skull,
   Zap,
   Settings,
+  Flame,
 } from 'lucide-react';
 import { GuildData } from '../../types/savegame';
 import { useTranslation } from '../../lib/i18n';
@@ -15,6 +16,7 @@ import { useTranslation } from '../../lib/i18n';
 export type NavTabId =
   | 'roster'
   | 'recruits'
+  | 'synergy'
   | 'graveyard'
   | 'guild'
   | 'armoury'
@@ -81,6 +83,12 @@ export const GameSidebar: React.FC<GameSidebarProps> = ({
               dot={recruitsCount > 0}
               isActive={activeTab === 'recruits'}
               onClick={() => onChangeTab('recruits')}
+            />
+            <SidebarItem
+              label={t.navSynergy}
+              icon={<Flame className="w-3.5 h-3.5 text-[#dfb15b]" />}
+              isActive={activeTab === 'synergy'}
+              onClick={() => onChangeTab('synergy')}
             />
             <SidebarItem
               label={t.navFallen}

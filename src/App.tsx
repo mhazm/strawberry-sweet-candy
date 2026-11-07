@@ -23,6 +23,7 @@ import { RosterView } from './components/roster/RosterView';
 import { QuickCheats } from './components/cheats/QuickCheats';
 import { StashEditor } from './components/stash/StashEditor';
 import { GraveyardView } from './components/fallen/GraveyardView';
+import { SynergyPlannerView } from './components/synergy/SynergyPlannerView';
 
 export function App() {
   const [saveData, setSaveData] = useState<SaveGameRoot | null>(null);
@@ -349,6 +350,12 @@ export function App() {
                     guild={saveData.guild}
                     onChange={handleUpdateGuild}
                   />
+                </div>
+              )}
+
+              {activeTab === 'synergy' && (
+                <div className="h-full overflow-y-auto pr-1">
+                  <SynergyPlannerView guild={saveData.guild} />
                 </div>
               )}
 
