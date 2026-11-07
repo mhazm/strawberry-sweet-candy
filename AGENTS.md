@@ -28,37 +28,47 @@ The application is architected to run seamlessly in two distinct environments:
 
 ---
 
-## 🏷️ 2. Semantic Versioning & Git Protocol (CRITICAL)
+## 🏷️ 2. Semantic Versioning & Release Protocol (CRITICAL)
 
-Starting immediately, all changes to this repository follow strict **Semantic Versioning (SemVer: `MAJOR.MINOR.PATCH`)**:
-- **MAJOR (`X.0.0`)**: Incompatible architectural changes or breaking savegame schema migrations.
-- **MINOR (`0.X.0` or `1.X.0`)**: New feature, new view, new language, or backward-compatible enhancement.
-- **PATCH (`0.0.X` or `1.0.X`)**: Bug fixes, tooltip improvements, translation tweaks, styling adjustments.
+The active development version is locked at **`1.0.0`** until a public release is cut via GitHub Actions.
 
-### ⚠️ The Three-File Version Synchronization Rule
-Before committing and pushing ANY change to GitHub, you **MUST** update the version in all three files synchronously:
+### Release & Versioning Policy
+- **Day-to-day dev commits**: Do **NOT** increment the version number. Commit features and fixes under the current active version (`1.0.0`).
+- **Public Release Bumps**: Version increments happen **STRICTLY** when preparing a public release via GitHub Actions (by pushing a release tag such as `v1.1.0` or running a release workflow).
+  - **MAJOR (`X.0.0`)**: Incompatible architectural changes or breaking savegame schema migrations.
+  - **MINOR (`1.X.0`)**: New feature, new view, new language, or backward-compatible enhancement.
+  - **PATCH (`1.0.X`)**: Bug fixes, tooltip improvements, translation tweaks, styling adjustments.
+
+### ⚠️ The Three-File Version Synchronization Rule (When Releasing)
+Whenever a release is prepared, you **MUST** update the version in all three files synchronously:
 
 1. [`package.json`](package.json) ➔ `"version": "X.Y.Z"`
 2. [`src-tauri/tauri.conf.json`](src-tauri/tauri.conf.json) ➔ `"version": "X.Y.Z"`
 3. [`src-tauri/Cargo.toml`](src-tauri/Cargo.toml) ➔ `version = "X.Y.Z"`
 
-### Commit & Push Checklist
+### 🚀 GitHub Actions CI/CD & Auto-Updater Architecture
+Releases are automated via GitHub Actions using the `tauri-apps/tauri-action` pipeline:
+- **Workflow Trigger**: Triggered by pushing a version tag (e.g. `git tag v1.0.0 && git push origin v1.0.0`) or manually via `workflow_dispatch`.
+- **Artifacts Generated**: Windows NSIS setup installer (`.exe`), Windows MSI installer (`.msi`), portable zip, and update bundle (`latest.json` + `.tar.gz.sig`).
+- **Cryptographic Signing**: Tauri signs bundles with `TAURI_SIGNING_PRIVATE_KEY` configured in GitHub Secrets.
+- **In-App Auto-Updater**: Users receive automatic in-app prompts to download and install updates directly from GitHub Releases (`latest.json`), eliminating manual downloads.
+
+### Daily Commit & Push Checklist
 Every agent turn that modifies code must follow this sequence:
 ```bash
-# 1. Update version across package.json, tauri.conf.json, and Cargo.toml
-# 2. Verify type safety and build
+# 1. Verify type safety and build
 npx tsc --noEmit
 
-# 3. Check git status to ensure .gitignore is effective
+# 2. Check git status to ensure .gitignore is effective
 git status
 
-# 4. Stage specific files
+# 3. Stage specific files
 git add <modified-files>
 
-# 5. Commit using Conventional Commits format
+# 4. Commit using Conventional Commits format
 git commit -m "<type>(<scope>): <imperative summary>" -m "<detailed description>"
 
-# 6. Push to remote main
+# 5. Push to remote main
 git push origin main
 ```
 
@@ -311,3 +321,4 @@ dnd-saveeditor/
 3. **Never touch the user's game backups folder**: keep backups in `%APPDATA%\dnd-saveeditor\editor-backups\`.
 4. **Never hardcode UI text**: use `useTranslation()`.
 5. **Always type-check with `npx tsc --noEmit`** before staging and committing with Conventional Commits.
+
