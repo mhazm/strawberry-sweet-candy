@@ -6,9 +6,13 @@ import {
   RotateCcw,
   Clock,
   Sparkles,
+  RefreshCw,
+  CheckCircle,
+  ExternalLink,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { isTauri, listGameBackups, BackupFileInfo } from '../../lib/tauri';
+import { checkForUpdate, UpdateInfo } from '../../lib/updater';
 import { useTranslation } from '../../lib/i18n';
 
 interface SettingsModalProps {
@@ -20,6 +24,7 @@ interface SettingsModalProps {
   onCloseSave: () => void;
   onReset: () => void;
   isModified: boolean;
+  onUpdateFound?: (update: UpdateInfo) => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -31,15 +36,40 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onCloseSave,
   onReset,
   isModified,
+  onUpdateFound,
 }) => {
   const { t } = useTranslation();
   const [backups, setBackups] = useState<BackupFileInfo[]>([]);
+  const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
+  const [updateStatus, setUpdateStatus] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen && isTauri()) {
       listGameBackups().then((files) => setBackups(files));
     }
+    if (isOpen) {
+      setUpdateStatus(null);
+    }
   }, [isOpen]);
+
+  const handleCheckUpdate = async () => {
+    setIsCheckingUpdate(true);
+    setUpdateStatus(null);
+    try {
+      const update = await checkForUpdate();
+      if (update) {
+        if (onUpdateFound) {
+          onUpdateFound(update);
+        }
+      } else {
+        setUpdateStatus('Aplikasi Anda sudah dalam versi terbaru (v1.0.0).');
+      }
+    } catch {
+      setUpdateStatus('Tidak dapat terhubung ke server pembaruan.');
+    } finally {
+      setIsCheckingUpdate(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -131,6 +161,40 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <p className="text-[10px] text-[#635545]">
               {t.safeBackupNote}
             </p>
+          </div>
+
+          {/* Software Version & Auto-Updater Section */}
+          <div className="p-3.5 rounded-xl bg-[#110d14] border border-[#2e2336] space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-[#dfb15b] font-semibold text-xs">
+                <Sparkles className="w-4 h-4 text-[#dfb15b]" />
+                <span>Pembaruan Aplikasi (Auto-Update)</span>
+              </div>
+              <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-[#1f1726] border border-[#3f2e4d] text-[#e8d5be]">
+                v1.0.0
+              </span>
+            </div>
+            <p className="text-[11px] text-[#8e8070] leading-relaxed">
+              Aplikasi ini otomatis memeriksa pembaruan resmi dari GitHub Releases saat dibuka. Anda juga dapat memeriksanya secara manual kapan saja.
+            </p>
+            <div className="pt-1 flex flex-col gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleCheckUpdate}
+                disabled={isCheckingUpdate}
+                className="w-full flex items-center justify-center gap-2"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isCheckingUpdate ? 'animate-spin text-[#dfb15b]' : ''}`} />
+                {isCheckingUpdate ? 'Memeriksa GitHub...' : 'Periksa Pembaruan Sekarang'}
+              </Button>
+              {updateStatus && (
+                <div className="flex items-center gap-1.5 text-[11px] text-[#4ade80] bg-[#4ade80]/10 border border-[#4ade80]/20 rounded-md px-2.5 py-1.5">
+                  <CheckCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span>{updateStatus}</span>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Tauri Detected Backups */}

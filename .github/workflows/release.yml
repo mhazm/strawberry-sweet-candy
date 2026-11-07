@@ -1,0 +1,66 @@
+name: Release & Auto Update
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & Publish Release
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Rust Stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust Cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Tauri App & Publish Release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: 'Dungeons & Dynasties Save Editor ${{ github.ref_name }}'
+          releaseBody: |
+            ## 🛡️ Dungeons & Dynasties Save Game Editor ${{ github.ref_name }}
+
+            ### ✨ Highlights:
+            - Full Guild treasury, renown, mode toggles, and staff management
+            - Delver roster editor with 30 combat attributes and 7 hidden FM traits
+            - Wonderkid generator with class-key optimization
+            - Safe dedicated backup system in `%APPDATA%\dnd-saveeditor\editor-backups\`
+            - Full multi-language localization across 8 languages
+            - Built-in automatic self-updater
+
+            ### 📦 Installers & Standalone:
+            - **NSIS Setup**: `...setup.exe`
+            - **Windows MSI**: `...x64.msi`
+            - **Auto-Updater Manifest**: `latest.json`
+          releaseDraft: false
+          prerelease: false

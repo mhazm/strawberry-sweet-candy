@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Upload,
   CheckCircle2,
@@ -12,6 +12,8 @@ import {
   writeSaveFileTauri,
   BackupFileInfo,
 } from './lib/tauri';
+import { checkForUpdate, UpdateInfo } from './lib/updater';
+import { UpdateModal } from './components/layout/UpdateModal';
 import { WelcomeScreen } from './components/layout/WelcomeScreen';
 import { GameSidebar, NavTabId } from './components/layout/GameSidebar';
 import { GameTopBar } from './components/layout/GameTopBar';
@@ -31,12 +33,22 @@ export function App() {
   const [isModified, setIsModified] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [pendingUpdate, setPendingUpdate] = useState<UpdateInfo | null>(null);
   const [notification, setNotification] = useState<{
     type: 'success' | 'error';
     message: string;
   } | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-check for updates on launch
+  useEffect(() => {
+    checkForUpdate().then((update) => {
+      if (update) {
+        setPendingUpdate(update);
+      }
+    });
+  }, []);
 
   const showToast = (type: 'success' | 'error', message: string) => {
     setNotification({ type, message });
@@ -372,7 +384,19 @@ export function App() {
         onCloseSave={handleCloseSave}
         onReset={handleReset}
         isModified={isModified}
+        onUpdateFound={(update) => {
+          setIsSettingsOpen(false);
+          setPendingUpdate(update);
+        }}
       />
+
+      {/* Auto-Update Modal */}
+      {pendingUpdate && (
+        <UpdateModal
+          updateInfo={pendingUpdate}
+          onClose={() => setPendingUpdate(null)}
+        />
+      )}
     </div>
   );
 }

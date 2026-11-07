@@ -61,7 +61,9 @@ fn list_game_backups() -> Result<Vec<BackupFileInfo>, String> {
 fn get_editor_backups_path() -> PathBuf {
     // Save editor backups in a dedicated folder in AppData or current directory
     if let Ok(appdata) = std::env::var("APPDATA") {
-        let p = PathBuf::from(appdata).join("dnd-saveeditor").join("editor-backups");
+        let p = PathBuf::from(appdata)
+            .join("dnd-saveeditor")
+            .join("editor-backups");
         let _ = fs::create_dir_all(&p);
         p
     } else {
@@ -89,7 +91,7 @@ fn write_save_file(path: String, content: String, make_backup: bool) -> Result<S
             .map(|d| d.as_secs())
             .unwrap_or(0);
         let backup_file = backup_dir.join(format!("{}_backup_{}.json", file_stem, timestamp));
-        
+
         let _ = fs::copy(&p, &backup_file);
         backup_info = backup_file.to_string_lossy().to_string();
     }
@@ -101,6 +103,8 @@ fn write_save_file(path: String, content: String, make_backup: bool) -> Result<S
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
             get_backups_dir,
             list_game_backups,
