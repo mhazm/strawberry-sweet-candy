@@ -28,17 +28,31 @@ import { Tooltip } from '../ui/Tooltip';
 
 interface SynergyPlannerViewProps {
   guild: GuildData;
+  initialPartyIds?: string[];
 }
 
-export const SynergyPlannerView: React.FC<SynergyPlannerViewProps> = ({ guild }) => {
+export const SynergyPlannerView: React.FC<SynergyPlannerViewProps> = ({ guild, initialPartyIds }) => {
   const { t } = useTranslation();
   const roster = useMemo(() => guild.roster || [], [guild.roster]);
 
   // Selected party in planner (max 6 members)
   const [selectedParty, setSelectedParty] = useState<Adventurer[]>(() => {
+    if (initialPartyIds && initialPartyIds.length > 0) {
+      const initial = (guild.roster || []).filter((d) => initialPartyIds.includes(d.id));
+      if (initial.length > 0) return initial;
+    }
     // Default to the first 4 members of the active roster if available
     return roster.slice(0, 4);
   });
+
+  React.useEffect(() => {
+    if (initialPartyIds && initialPartyIds.length > 0) {
+      const matching = roster.filter((d) => initialPartyIds.includes(d.id));
+      if (matching.length > 0) {
+        setSelectedParty(matching);
+      }
+    }
+  }, [initialPartyIds, roster]);
 
   // Filter state for roster list
   const [searchTerm, setSearchTerm] = useState('');
@@ -507,3 +521,4 @@ export const SynergyPlannerView: React.FC<SynergyPlannerViewProps> = ({ guild })
     </div>
   );
 };
+

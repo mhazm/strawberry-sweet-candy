@@ -24,6 +24,7 @@ import { QuickCheats } from './components/cheats/QuickCheats';
 import { StashEditor } from './components/stash/StashEditor';
 import { GraveyardView } from './components/fallen/GraveyardView';
 import { SynergyPlannerView } from './components/synergy/SynergyPlannerView';
+import { DungeonConditionView } from './components/conditions/DungeonConditionView';
 
 export function App() {
   const [saveData, setSaveData] = useState<SaveGameRoot | null>(null);
@@ -31,6 +32,7 @@ export function App() {
   const [filename, setFilename] = useState<string>('');
   const [filePath, setFilePath] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<NavTabId>('roster');
+  const [synergyPartyIds, setSynergyPartyIds] = useState<string[]>([]);
   const [isModified, setIsModified] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -355,7 +357,22 @@ export function App() {
 
               {activeTab === 'synergy' && (
                 <div className="h-full overflow-y-auto pr-1">
-                  <SynergyPlannerView guild={saveData.guild} />
+                  <SynergyPlannerView
+                    guild={saveData.guild}
+                    initialPartyIds={synergyPartyIds}
+                  />
+                </div>
+              )}
+
+              {activeTab === 'conditions' && (
+                <div className="h-full overflow-y-auto pr-1">
+                  <DungeonConditionView
+                    guild={saveData.guild}
+                    onDeploySynergy={(partyIds) => {
+                      setSynergyPartyIds(partyIds);
+                      setActiveTab('synergy');
+                    }}
+                  />
                 </div>
               )}
 

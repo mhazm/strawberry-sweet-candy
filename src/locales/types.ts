@@ -39,6 +39,7 @@ export interface TranslationSchema {
   navFallen: string;
   navArmoury: string;
   navSynergy: string;
+  navConditions: string;
   navGuildOverview: string;
   navQuickCheats: string;
   navSettings: string;
@@ -61,6 +62,57 @@ export interface TranslationSchema {
   synergyClearParty: string;
   synergySlotsUsed: string;
   synergyNoSynergyFound: string;
+
+  // Dungeon Conditions Scout
+  conditionTitle: string;
+  conditionSubtitle: string;
+  conditionTabContracts: string;
+  conditionTabPresets: string;
+  conditionNoContracts: string;
+  conditionContractLabel: string;
+  conditionBiomeLabel: string;
+  conditionDangerLabel: string;
+  conditionPossibleHazards: string;
+  conditionNoActiveHazard: string;
+  conditionDossierTitle: string;
+  conditionPenaltyLabel: string;
+  conditionImmuneStyle: string;
+  conditionPenalizedStyle: string;
+  conditionCounterGearLabel: string;
+  conditionCounterTraitsLabel: string;
+  conditionInStashBadge: string;
+  conditionEquippedBadge: string;
+  conditionRecommendedSquad: string;
+  conditionSquadSubtitle: string;
+  conditionDeploySynergy: string;
+  conditionRosterReadiness: string;
+  conditionFilterAll: string;
+  conditionFilterOptimal: string;
+  conditionFilterViable: string;
+  conditionFilterVulnerable: string;
+  conditionReadinessScore: string;
+  conditionFactorsLabel: string;
+  conditionGearAvailableStash: string;
+
+  // Condition Names, Descriptions & Penalties
+  condFlooded: string;
+  condFloodedDesc: string;
+  condFloodedPenalty: string;
+  condPitchDark: string;
+  condPitchDarkDesc: string;
+  condPitchDarkPenalty: string;
+  condCursedGround: string;
+  condCursedGroundDesc: string;
+  condCursedGroundPenalty: string;
+  condDeepCold: string;
+  condDeepColdDesc: string;
+  condDeepColdPenalty: string;
+  condInfernal: string;
+  condInfernalDesc: string;
+  condInfernalPenalty: string;
+  condNumbingFrost: string;
+  condNumbingFrostDesc: string;
+  condNumbingFrostPenalty: string;
 
   // Roster View & Table
   rosterTitle: string;
