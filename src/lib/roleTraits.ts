@@ -90,3 +90,4 @@ export function isTraitHarmfulForRole(traitId: string, role: 'tank' | 'dps' | 'h
 export function getOptimalPresetForRole(role: 'tank' | 'dps' | 'healer'): string[] {
   return ROLE_TRAIT_MAP[role]?.optimalPreset || [];
 }
+

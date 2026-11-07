@@ -219,7 +219,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       </div>
                       <div className="text-[9px] text-[#6e6051] flex items-center gap-1 mt-0.5">
                         <Clock className="w-2.5 h-2.5" />
-                        {new Date(b.modified).toLocaleString()}
+                        {new Date(b.modified < 1e11 ? b.modified * 1000 : b.modified).toLocaleString()}
                       </div>
                     </div>
                     <span className="text-[10px] font-mono text-[#86afdf] shrink-0">
