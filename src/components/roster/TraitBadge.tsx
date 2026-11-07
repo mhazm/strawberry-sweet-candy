@@ -36,12 +36,49 @@ export const TraitBadge: React.FC<TraitBadgeProps> = ({ traitId }) => {
     badgeColor = 'text-[#e67e8c] bg-[#2d1419] border-[#5e222c]';
   }
 
+  // Extra mechanics information (Combat AI parameters or event details)
+  let extraContent: React.ReactNode = null;
+  if (trait?.behaviorEffect) {
+    const entries = Object.entries(trait.behaviorEffect);
+    extraContent = (
+      <div className="mt-2 pt-2 border-t border-[#3d324f]/60 flex flex-wrap gap-1">
+        {entries.map(([k, v]) => {
+          const pct = Math.round(v * 100);
+          const sign = pct > 0 ? `+${pct}%` : `${pct}%`;
+          const isPos = pct > 0;
+          return (
+            <span
+              key={k}
+              className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
+                isPos ? 'bg-[#22c55e]/15 text-[#4ade80]' : 'bg-[#ef4444]/15 text-[#f87171]'
+              }`}
+            >
+              {k}: {sign}
+            </span>
+          );
+        })}
+      </div>
+    );
+  } else if (trait?.nonCombat && trait.nonCombat.detail && trait.nonCombat.detail.length > 0) {
+    extraContent = (
+      <div className="mt-2 pt-2 border-t border-[#3d324f]/60 text-[10px] text-[#c2b6cb] space-y-0.5">
+        {trait.nonCombat.detail.map((d, i) => (
+          <div key={i} className="flex items-start gap-1">
+            <span className="text-[#dfb15b]">•</span>
+            <span>{d}</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <Tooltip
       title={name}
       badge={typeLabel}
       badgeColor={badgeColor}
       content={desc}
+      extra={extraContent}
     >
       <span
         className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium border transition-all cursor-help select-none ${badgeStyle}`}

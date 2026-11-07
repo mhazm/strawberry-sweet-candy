@@ -509,98 +509,1256 @@ export interface TraitInfo {
   name: string;
   type: 'positive' | 'negative' | 'neutral';
   desc: string;
+  tag?: string;
+  behaviorEffect?: Record<string, number> | null;
+  nonCombat?: {
+    tag?: string;
+    summary?: string;
+    systems?: string[];
+    detail?: string[];
+  } | null;
 }
 
 export const TRAIT_CATALOG: TraitInfo[] = [
-  // Positive Combat & Survival
-  { id: 'brave', name: 'Brave', type: 'positive', desc: 'Exceptional valor against terrifying monsters' },
-  { id: 'dauntless', name: 'Dauntless', type: 'positive', desc: 'Unshakable when confronted with insurmountable odds' },
-  { id: 'big-game-player', name: 'Big Game Player', type: 'positive', desc: 'Levels up combat performance during boss encounters' },
-  { id: 'death-defying', name: 'Death Defying', type: 'positive', desc: 'Incredible ability to survive mortal strikes' },
-  { id: 'giant-killer', name: 'Giant Killer', type: 'positive', desc: 'Bonus damage and precision against massive brutes' },
-  { id: 'unbreakable', name: 'Unbreakable', type: 'positive', desc: 'Body and spirit cannot be broken by dungeon despair' },
-  { id: 'hardy', name: 'Hardy', type: 'positive', desc: 'Naturally high constitution and wound resilience' },
-  { id: 'thick-skinned', name: 'Thick Skinned', type: 'positive', desc: 'Reduces damage received from physical blows' },
-  { id: 'tireless', name: 'Tireless', type: 'positive', desc: 'Rarely suffers from expedition fatigue' },
-  { id: 'quick-to-mend', name: 'Quick to Mend', type: 'positive', desc: 'Heals wounds and injuries twice as fast' },
-  { id: 'quick-witted', name: 'Quick Witted', type: 'positive', desc: 'Rapid learner who absorbs tactical feedback immediately' },
-  { id: 'consistent', name: 'Consistent', type: 'positive', desc: 'Consistently performs at peak ability week in and week out' },
-  { id: 'sure-footed', name: 'Sure Footed', type: 'positive', desc: 'Immune to trip hazards and rough terrain stumbling' },
-  { id: 'trap-wise', name: 'Trap Wise', type: 'positive', desc: 'Easily spots hidden pressure plates and dungeon snares' },
-  { id: 'field-medic', name: 'Field Medic', type: 'positive', desc: 'Provides emergency first aid to wounded comrades' },
-  { id: 'crucible-raised', name: 'Crucible Raised', type: 'positive', desc: 'Forged in tournament fires with fierce competitive drive' },
-  { id: 'stalwart', name: 'Stalwart', type: 'positive', desc: 'Unmoving anchor for party formations' },
-  { id: 'steady', name: 'Steady', type: 'positive', desc: 'Reliable under all combat conditions' },
-  { id: 'stoic', name: 'Stoic', type: 'positive', desc: 'Endures pain and hardship without losing focus' },
-  { id: 'pathfinder', name: 'Pathfinder', type: 'positive', desc: 'Guides the party safely through treacherous dungeon paths' },
-  { id: 'ash-hardened', name: 'Ash Hardened', type: 'positive', desc: 'Resistant to fire and scorched ground' },
-  { id: 'deeps-taught', name: 'Deeps Taught', type: 'positive', desc: 'Instinctive mastery of the underdark tunnels' },
-  { id: 'deep-seasoned', name: 'Deep Seasoned', type: 'positive', desc: 'Decades of surviving deep delve horrors' },
-  { id: 'vigilant', name: 'Vigilant', type: 'positive', desc: 'Never ambushed or caught unprepared' },
-  { id: 'watchful', name: 'Watchful', type: 'positive', desc: 'Keeps an eye on the shadows at all times' },
-  { id: 'weathered', name: 'Weathered', type: 'positive', desc: 'Seasoned traveler hardened to all elements' },
-  { id: 'well-preserved', name: 'Well Preserved', type: 'positive', desc: 'Ages gracefully with minimal attribute decline' },
-  { id: 'lucky', name: 'Lucky', type: 'positive', desc: 'Fortune favors them in critical moments' },
-  { id: 'hopeful', name: 'Hopeful', type: 'positive', desc: 'Keeps high party morale even when dark falls' },
-  { id: 'iron-willed', name: 'Iron Willed', type: 'positive', desc: 'Resistant to mental manipulation and charm' },
-  { id: 'indomitable', name: 'Indomitable', type: 'positive', desc: 'Refuses to accept defeat under any condition' },
-  { id: 'inspiring', name: 'Inspiring', type: 'positive', desc: 'Rallies all party members in desperate moments' },
-  { id: 'team-player', name: 'Team Player', type: 'positive', desc: 'Maximizes bond gains and synergy power' },
-  { id: 'professional', name: 'Professional', type: 'positive', desc: 'Treats dungeoneering with utmost tactical seriousness' },
-  { id: 'diligent', name: 'Diligent', type: 'positive', desc: 'Trains harder and gains extra XP per training session' },
-  { id: 'dutiful', name: 'Dutiful', type: 'positive', desc: 'Always obeys tactical instructions without hesitation' },
-  { id: 'mentor', name: 'Mentor', type: 'positive', desc: 'Helps younger delvers grow and level up quicker' },
-  { id: 'quiet-example', name: 'Quiet Example', type: 'positive', desc: 'Leads by deeds rather than words' },
-  { id: 'cool-headed', name: 'Cool Headed', type: 'positive', desc: 'Composed under high stress conditions' },
-  { id: 'charismatic', name: 'Charismatic', type: 'positive', desc: 'Loved by the crowd and respected by peers' },
-  { id: 'crowd-pleaser', name: 'Crowd Pleaser', type: 'positive', desc: 'Earns extra renown and spectator cheers' },
-  { id: 'loyal', name: 'Loyal', type: 'positive', desc: 'Will never accept poach offers from rival guilds' },
-  { id: 'oathbound', name: 'Oathbound', type: 'positive', desc: 'Bound by sacred honor to serve the guild hall' },
-
-  // Negative / Flaws
-  { id: 'cowardly', name: 'Cowardly', type: 'negative', desc: 'Prone to fleeing in terror when HP gets low' },
-  { id: 'claustrophobic', name: 'Claustrophobic', type: 'negative', desc: 'Suffers severe stress in tight corridors and tunnels' },
-  { id: 'clumsy', name: 'Clumsy', type: 'negative', desc: 'Prone to tripping and making noise in stealth situations' },
-  { id: 'frail', name: 'Frail', type: 'negative', desc: 'Lower natural health and prone to sudden injuries' },
-  { id: 'glass-jawed', name: 'Glass Jawed', type: 'negative', desc: 'Susceptible to knockouts and critical injuries' },
-  { id: 'brittle', name: 'Brittle', type: 'negative', desc: 'Bones break easily under brute attacks' },
-  { id: 'insubordinate', name: 'Insubordinate', type: 'negative', desc: 'Occasionally ignores tactical instructions during delves' },
-  { id: 'jinxed', name: 'Jinxed', type: 'negative', desc: 'Unfortunate random events seem to follow them' },
-  { id: 'slow-to-mend', name: 'Slow to Mend', type: 'negative', desc: 'Takes far longer to recover from dungeon injuries' },
-  { id: 'hot-headed', name: 'Hot Headed', type: 'negative', desc: 'Loses temper easily and rushes ahead foolishly' },
-  { id: 'reckless', name: 'Reckless', type: 'negative', desc: 'Takes unnecessary risks that endanger the whole party' },
-  { id: 'sore-loser', name: 'Sore Loser', type: 'negative', desc: 'Suffers massive morale loss on defeats' },
-  { id: 'vain', name: 'Vain', type: 'negative', desc: 'Obsessed with appearances over substance' },
-  { id: 'arrogant', name: 'Arrogant', type: 'negative', desc: 'Underestimates opponents and ignores warnings' },
-  { id: 'fair-weather', name: 'Fair Weather', type: 'negative', desc: 'Morale collapses when the guild faces tough times' },
-  { id: 'haunted', name: 'Haunted', type: 'negative', desc: 'Plagued by nightmares of past fallen comrades' },
-  { id: 'death-seeker', name: 'Death Seeker', type: 'negative', desc: 'Subconsciously seeks an honorable end in battle' },
-  { id: 'light-sleeper', name: 'Light Sleeper', type: 'negative', desc: 'Struggles to rest and recover stamina in damp camps' },
-  { id: 'streaky', name: 'Streaky', type: 'negative', desc: 'Wildly inconsistent form—brilliant one day, awful the next' },
-  { id: 'unforgiving', name: 'Unforgiving', type: 'negative', desc: 'Holds grudges against allies who make tactical mistakes' },
-
-  // Neutral / Roleplay / Economy
-  { id: 'coin-minded', name: 'Coin Minded', type: 'neutral', desc: 'Motivated primarily by gold bonuses and wages' },
-  { id: 'greedy', name: 'Greedy', type: 'neutral', desc: 'Demands a larger share of the dungeon plunder' },
-  { id: 'thrifty', name: 'Thrifty', type: 'neutral', desc: 'Maintains equipment carefully to save gold' },
-  { id: 'hard-bargainer', name: 'Hard Bargainer', type: 'neutral', desc: 'Fierce contract negotiator' },
-  { id: 'gambler', name: 'Gambler', type: 'neutral', desc: 'Loves high-stakes bets in tavern halls' },
-  { id: 'glory-hunter', name: 'Glory Hunter', type: 'neutral', desc: 'Craves renown and public fame above all else' },
-  { id: 'generous', name: 'Generous', type: 'neutral', desc: 'Shares bonuses freely with fellow guild members' },
-  { id: 'traditional', name: 'Traditional', type: 'neutral', desc: 'Prefers standard ancient techniques over new tactics' },
-  { id: 'old-school', name: 'Old School', type: 'neutral', desc: 'Believes the old dungeon codes were the best' },
-  { id: 'old-soldier', name: 'Old Soldier', type: 'neutral', desc: 'Hardened veteran who has seen it all' },
-  { id: 'homebody', name: 'Homebody', type: 'neutral', desc: 'Dislikes long expeditions away from the guild hall' },
-  { id: 'restless', name: 'Restless', type: 'neutral', desc: 'Gets irritable if benched for more than a few days' },
-  { id: 'curious', name: 'Curious', type: 'neutral', desc: 'Investigates strange arcane symbols and curios' },
-  { id: 'early-riser', name: 'Early Riser', type: 'neutral', desc: 'First to awaken and prepare gear for the day' },
-  { id: 'easygoing', name: 'Easygoing', type: 'neutral', desc: 'Gets along easily with almost any party member' },
-  { id: 'companionable', name: 'Companionable', type: 'neutral', desc: 'Fast friendships with fellow adventurers' },
-  { id: 'lone-wolf', name: 'Lone Wolf', type: 'neutral', desc: 'Prefers fighting independently rather than in tight formations' },
-  { id: 'late-bloomer', name: 'Late Bloomer', type: 'neutral', desc: 'Reaches peak development later in life' },
-  { id: 'blood-drunk', name: 'Blood Drunk', type: 'neutral', desc: 'Enters a blood frenzy when slaying foes' },
-  { id: 'bearer-of-the-fallen', name: 'Bearer of the Fallen', type: 'neutral', desc: 'Carries tokens of deceased heroes into battle' },
-  { id: 'superstitious', name: 'Superstitious', type: 'neutral', desc: 'Performs rituals before opening chests or doors' },
+  {
+    "id": "broad-hand",
+    "name": "A Broad Hand",
+    "type": "positive",
+    "desc": "Reduces the cross-role teaching penalty when mentoring delvers.",
+    "tag": "Training",
+    "behaviorEffect": null,
+    "nonCombat": {
+      "tag": "Training",
+      "summary": "Reduces the cross-role teaching penalty.",
+      "systems": [
+        "Training"
+      ],
+      "detail": [
+        "Non-matching-class fit moves halfway toward 1.",
+        "Cross-role fit becomes 0.775 instead of 0.55."
+      ]
+    }
+  },
+  {
+    "id": "quiet-example",
+    "name": "Quiet Example",
+    "type": "positive",
+    "desc": "Leads by deeds rather than words",
+    "tag": "Training",
+    "behaviorEffect": null,
+    "nonCombat": {
+      "tag": "Training",
+      "summary": "Adds an automatic mentoring place.",
+      "systems": [
+        "Training"
+      ],
+      "detail": [
+        "An available Seasoned, Veteran or Twilight carrier supplies one extra teaching place.",
+        "This does not add a physical Training Yard bench."
+      ]
+    }
+  },
+  {
+    "id": "ambitious",
+    "name": "Ambitious",
+    "type": "positive",
+    "desc": "Aggressively pursues enemy eliminations (+15% Kill Hunger).",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "killHunger": 0.15
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "arrogant",
+    "name": "Arrogant",
+    "type": "positive",
+    "desc": "Underestimates opponents and ignores warnings",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "courage": 0.3,
+      "recklessness": 0.15,
+      "protectiveness": -0.2
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "ash-hardened",
+    "name": "Ash Hardened",
+    "type": "positive",
+    "desc": "Resistant to fire and scorched ground",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "bearer-of-the-fallen",
+    "name": "Bearer of the Fallen",
+    "type": "positive",
+    "desc": "Carries tokens of deceased heroes into battle",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "big-game-player",
+    "name": "Big Game Player",
+    "type": "positive",
+    "desc": "Levels up combat performance during boss encounters",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "blood-drunk",
+    "name": "Blood Drunk",
+    "type": "positive",
+    "desc": "Enters a blood frenzy when slaying foes",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "courage": 0.2
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "bog-bred",
+    "name": "Bog-Bred",
+    "type": "positive",
+    "desc": "Native familiarity with foul bogs, swamps, and flooded tunnels.",
+    "tag": "Environment",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "mentor",
+    "name": "Mentor",
+    "type": "positive",
+    "desc": "Helps younger delvers grow and level up quicker",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "lead": 0.03,
+      "protectiveness": 0.25
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "brave",
+    "name": "Brave",
+    "type": "positive",
+    "desc": "Exceptional valor against terrifying monsters",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "threatMult": 0.08,
+      "courage": 0.12
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "brittle",
+    "name": "Brittle",
+    "type": "positive",
+    "desc": "Bones break easily under brute attacks",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "courage": -0.26,
+      "poise": 0.05,
+      "steady": 0.06
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "cave-grown",
+    "name": "Cave-Grown",
+    "type": "positive",
+    "desc": "Born in deep subterranean caverns; immune to underground disorientation.",
+    "tag": "Environment",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "charismatic",
+    "name": "Charismatic",
+    "type": "positive",
+    "desc": "Loved by the crowd and respected by peers",
+    "tag": "Relationships",
+    "behaviorEffect": null,
+    "nonCombat": {
+      "tag": "Relationships",
+      "summary": "Speeds up how heroes bond — every surviving pair that includes a Charismatic hero gains extra relationship growth after a delve.",
+      "systems": [
+        "Relationships"
+      ],
+      "detail": [
+        "Adds to a party's positive social pull: each Charismatic hero raises the affinity between any two heroes by +1 (capped at plus or minus 3).",
+        "After a delve, a surviving pair's relationship shifts by 7 + affinity x3 — so one Charismatic in the pair is usually +3 on top.",
+        "Can tip the 12% relationship-event roll toward a warm bond instead of a clash."
+      ]
+    }
+  },
+  {
+    "id": "child-of-the-halls",
+    "name": "Child of the Halls",
+    "type": "positive",
+    "desc": "Raised in fortified halls; high morale and defense in ruin dungeons.",
+    "tag": "Social",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "claustrophobic",
+    "name": "Claustrophobic",
+    "type": "positive",
+    "desc": "Suffers severe stress in tight corridors and tunnels",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "clumsy",
+    "name": "Clumsy",
+    "type": "negative",
+    "desc": "Prone to tripping and making noise in stealth situations",
+    "tag": "Traps",
+    "behaviorEffect": null,
+    "nonCombat": {
+      "tag": "Traps",
+      "summary": "A double-edged trap trait: often stumbles through danger unhurt, but tends to leave gear behind in the dark.",
+      "systems": [
+        "Traps",
+        "Loot"
+      ],
+      "detail": [
+        "After failing a trap check, a Clumsy hero has a 50% chance to blunder through anyway — the party skips the usual HP and stress hit.",
+        "The catch: they drop their lowest-value non-Legendary item, lost to that dungeon's theme (Legendary gear is never dropped).",
+        "Lost kit isn't gone for good — a later delve of the same theme has a 55% chance to recover it, up to 3 items at once.",
+        "Never rolls onto a hero who is also Sure-Footed, Methodical or Professional."
+      ]
+    }
+  },
+  {
+    "id": "coin-minded",
+    "name": "Coin Minded",
+    "type": "positive",
+    "desc": "Motivated primarily by gold bonuses and wages",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "cold-tempered",
+    "name": "Cold-Tempered",
+    "type": "positive",
+    "desc": "Natural resistance against Deep Cold and freezing conditions.",
+    "tag": "Environment",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "companionable",
+    "name": "Companionable",
+    "type": "positive",
+    "desc": "Fast friendships with fellow adventurers",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "consistent",
+    "name": "Consistent",
+    "type": "positive",
+    "desc": "Consistently performs at peak ability week in and week out",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "cool-headed",
+    "name": "Cool Headed",
+    "type": "positive",
+    "desc": "Composed under high stress conditions",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "courage": 0.1,
+      "poise": -0.04,
+      "steady": -0.05,
+      "killHunger": -0.15
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "cowardly",
+    "name": "Cowardly",
+    "type": "positive",
+    "desc": "Prone to fleeing in terror when HP gets low",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "threatMult": -0.22,
+      "courage": -0.25
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "crowd-pleaser",
+    "name": "Crowd Pleaser",
+    "type": "positive",
+    "desc": "Earns extra renown and spectator cheers",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "crucible-raised",
+    "name": "Crucible Raised",
+    "type": "positive",
+    "desc": "Forged in tournament fires with fierce competitive drive",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "curious",
+    "name": "Curious",
+    "type": "positive",
+    "desc": "Investigates strange arcane symbols and curios",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "recklessness": 0.06
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "dauntless",
+    "name": "Dauntless",
+    "type": "positive",
+    "desc": "Unshakable when confronted with insurmountable odds",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "threatMult": 0.09,
+      "courage": 0.18
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "death-defying",
+    "name": "Death Defying",
+    "type": "positive",
+    "desc": "Incredible ability to survive mortal strikes",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "death-seeker",
+    "name": "Death Seeker",
+    "type": "positive",
+    "desc": "Subconsciously seeks an honorable end in battle",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "recklessness": 0.15
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "deep-seasoned",
+    "name": "Deep Seasoned",
+    "type": "positive",
+    "desc": "Decades of surviving deep delve horrors",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "deeps-taught",
+    "name": "Deeps Taught",
+    "type": "positive",
+    "desc": "Instinctive mastery of the underdark tunnels",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "diligent",
+    "name": "Diligent",
+    "type": "positive",
+    "desc": "Trains harder and gains extra XP per training session",
+    "tag": "Jobs & loadout",
+    "behaviorEffect": null,
+    "nonCombat": {
+      "tag": "Jobs & loadout",
+      "summary": "The disciplined worker: banks found gear for the armoury instead of swapping it in mid-delve, and performs better on Expedition contracts.",
+      "systems": [
+        "Contracts",
+        "Loadout"
+      ],
+      "detail": [
+        "Under a 'Gear up now' standing order, Diligent heroes won't auto-equip upgrades found in the dungeon — they pack them back to the armoury instead.",
+        "Liked by Expedition contracts: each matching hero adds +0.05 to the party's job suitability, nudging the outcome tier — and so the payout and renown — upward.",
+        "Never rolls alongside Reckless or Insubordinate."
+      ]
+    }
+  },
+  {
+    "id": "dutiful",
+    "name": "Dutiful",
+    "type": "positive",
+    "desc": "Always obeys tactical instructions without hesitation",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "early-riser",
+    "name": "Early Riser",
+    "type": "positive",
+    "desc": "First to awaken and prepare gear for the day",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "easygoing",
+    "name": "Easygoing",
+    "type": "positive",
+    "desc": "Gets along easily with almost any party member",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "exacting",
+    "name": "Exacting",
+    "type": "neutral",
+    "desc": "High mentor quality (x1.18), but adds stress to pupils during progress.",
+    "tag": "Training",
+    "behaviorEffect": null,
+    "nonCombat": {
+      "tag": "Training",
+      "summary": "Stronger teaching adds stress when the pupil makes progress.",
+      "systems": [
+        "Training"
+      ],
+      "detail": [
+        "Mentor quality ×1.18.",
+        "Successful mentored CA progress adds stress at 4 times the elapsed training scale."
+      ]
+    }
+  },
+  {
+    "id": "fair-weather",
+    "name": "Fair Weather",
+    "type": "positive",
+    "desc": "Morale collapses when the guild faces tough times",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "field-medic",
+    "name": "Field Medic",
+    "type": "positive",
+    "desc": "Provides emergency first aid to wounded comrades",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "protectiveness": 0.42
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "frail",
+    "name": "Frail",
+    "type": "positive",
+    "desc": "Lower natural health and prone to sudden injuries",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "gambler",
+    "name": "Gambler",
+    "type": "positive",
+    "desc": "Loves high-stakes bets in tavern halls",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "generous",
+    "name": "Generous",
+    "type": "positive",
+    "desc": "Shares bonuses freely with fellow guild members",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "protectiveness": 0.1
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "giant-killer",
+    "name": "Giant Killer",
+    "type": "positive",
+    "desc": "Bonus damage and precision against massive brutes",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "glass-jawed",
+    "name": "Glass Jawed",
+    "type": "positive",
+    "desc": "Susceptible to knockouts and critical injuries",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "glory-hunter",
+    "name": "Glory Hunter",
+    "type": "positive",
+    "desc": "Craves renown and public fame above all else",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "threatMult": 0.08,
+      "recklessness": 0.2,
+      "killHunger": 0.5
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "gold-nosed",
+    "name": "Gold-Nosed",
+    "type": "positive",
+    "desc": "Sharp instinct for sniffing out hidden strongboxes and treasure caches.",
+    "tag": "Dungeon",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "greedy",
+    "name": "Greedy",
+    "type": "positive",
+    "desc": "Demands a larger share of the dungeon plunder",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "recklessness": 0.1,
+      "killHunger": 0.25,
+      "protectiveness": -0.15
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "hard-bargainer",
+    "name": "Hard Bargainer",
+    "type": "positive",
+    "desc": "Fierce contract negotiator",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "hard-headed",
+    "name": "Hard-Headed",
+    "type": "positive",
+    "desc": "Stubborn refusal to retreat or panic under heavy enemy pressure.",
+    "tag": "Combat AI",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "hardy",
+    "name": "Hardy",
+    "type": "positive",
+    "desc": "Naturally high constitution and wound resilience",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "haunted",
+    "name": "Haunted",
+    "type": "positive",
+    "desc": "Plagued by nightmares of past fallen comrades",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "courage": -0.16,
+      "recklessness": -0.1
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "hollow-willed",
+    "name": "Hollow-Willed",
+    "type": "negative",
+    "desc": "Fragile spirit easily drained by cursed ground and dark magic.",
+    "tag": "Flaw",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "homebody",
+    "name": "Homebody",
+    "type": "positive",
+    "desc": "Dislikes long expeditions away from the guild hall",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "hopeful",
+    "name": "Hopeful",
+    "type": "positive",
+    "desc": "Keeps high party morale even when dark falls",
+    "tag": "Dungeon events",
+    "behaviorEffect": null,
+    "nonCombat": {
+      "tag": "Dungeon events",
+      "summary": "Keeps the party's spirits up: unlocks the good ending on several rest-and-relief dungeon events, and helps on Expedition contracts.",
+      "systems": [
+        "Dungeon events",
+        "Contracts"
+      ],
+      "detail": [
+        "The Quiet Shrine: opens the blessed branch — active members lose 18 stress instead of 6.",
+        "The Wounded Beast (only when the party has no healer): the merciful outcome grants gold, an item, and heals 12% max HP to everyone.",
+        "The Lost Party and The Starving Pilgrim: unlock the kind outcome — 12 stress off the party and a new bond pair (+7 to their bond if both survive).",
+        "Liked by Expedition contracts (+0.05 suitability). Never rolls alongside Superstitious or Haunted."
+      ]
+    }
+  },
+  {
+    "id": "horn-called",
+    "name": "Horn-Called",
+    "type": "positive",
+    "desc": "Rallies instantly to battle horns and guild mobilization orders.",
+    "tag": "Combat AI",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "hot-headed",
+    "name": "Hot Headed",
+    "type": "positive",
+    "desc": "Loses temper easily and rushes ahead foolishly",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "threatMult": 0.14,
+      "recklessness": 0.25,
+      "discipline": -0.2,
+      "killHunger": 0.1
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "humble",
+    "name": "Humble",
+    "type": "positive",
+    "desc": "Fights selflessly (+8% Courage, +10% Protectiveness toward allies).",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "courage": 0.08,
+      "protectiveness": 0.1
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "indomitable",
+    "name": "Indomitable",
+    "type": "positive",
+    "desc": "Refuses to accept defeat under any condition",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "inspiring",
+    "name": "Inspiring",
+    "type": "positive",
+    "desc": "Rallies all party members in desperate moments",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "lead": 0.06,
+      "protectiveness": 0.18
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "insubordinate",
+    "name": "Insubordinate",
+    "type": "positive",
+    "desc": "Occasionally ignores tactical instructions during delves",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "discipline": -0.18,
+      "protectiveness": -0.18
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "iron-willed",
+    "name": "Iron Willed",
+    "type": "positive",
+    "desc": "Resistant to mental manipulation and charm",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "threatMult": 0.06,
+      "courage": 0.12
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "jinxed",
+    "name": "Jinxed",
+    "type": "positive",
+    "desc": "Unfortunate random events seem to follow them",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "keeper-of-the-scorch",
+    "name": "Keeper of the Scorch",
+    "type": "positive",
+    "desc": "Hardened survivor of burning wastes; high fire and burn resilience.",
+    "tag": "Environment",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "kin-proud",
+    "name": "Kin-Proud",
+    "type": "positive",
+    "desc": "Fights with enhanced morale and coordination alongside members of the same race.",
+    "tag": "Social",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "late-bloomer",
+    "name": "Late Bloomer",
+    "type": "positive",
+    "desc": "Reaches peak development later in life",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "light-sleeper",
+    "name": "Light Sleeper",
+    "type": "positive",
+    "desc": "Struggles to rest and recover stamina in damp camps",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "light-fingered",
+    "name": "Light-Fingered",
+    "type": "positive",
+    "desc": "Adept at picking complex lockboxes and disarming trap triggers.",
+    "tag": "Dungeon",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "lone-wolf",
+    "name": "Lone Wolf",
+    "type": "positive",
+    "desc": "Prefers fighting independently rather than in tight formations",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "protectiveness": -0.5
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "long-rooted",
+    "name": "Long-Rooted",
+    "type": "positive",
+    "desc": "Enduring patience and stability during long encounters and sieges.",
+    "tag": "Combat AI",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "loyal",
+    "name": "Loyal",
+    "type": "positive",
+    "desc": "Will never accept poach offers from rival guilds",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "protectiveness": 0.4
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "lucky",
+    "name": "Lucky",
+    "type": "positive",
+    "desc": "Fortune favors them in critical moments",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "luck": 0.45
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "market-day-friend",
+    "name": "Market-Day Friend",
+    "type": "positive",
+    "desc": "Charismatic negotiator welcomed by merchants, reducing town store markups.",
+    "tag": "Guild",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "methodical",
+    "name": "Methodical",
+    "type": "positive",
+    "desc": "Disciplined and composed (+15% Discipline, -15% Recklessness, -5% Threat).",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "threatMult": -0.05,
+      "recklessness": -0.15,
+      "discipline": 0.15,
+      "killHunger": -0.15
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "night-eyed",
+    "name": "Night-Eyed",
+    "type": "positive",
+    "desc": "Keen dark vision that completely negates Pitch Dark accuracy penalties.",
+    "tag": "Environment",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "oathbound",
+    "name": "Oathbound",
+    "type": "positive",
+    "desc": "Bound by sacred honor to serve the guild hall",
+    "tag": "Oaths",
+    "behaviorEffect": null,
+    "nonCombat": {
+      "tag": "Oaths",
+      "summary": "Cheaper renewals and stronger retention.",
+      "systems": [
+        "Oaths"
+      ],
+      "detail": [
+        "Renewal ask ×0.62; haggle odds +35 percentage points.",
+        "Adds 10 to the rival-approach retention score.",
+        "Takes precedence over Loyal and Greedy in the renewal helper."
+      ]
+    }
+  },
+  {
+    "id": "old-school",
+    "name": "Old School",
+    "type": "positive",
+    "desc": "Believes the old dungeon codes were the best",
+    "tag": "Training",
+    "behaviorEffect": null,
+    "nonCombat": {
+      "tag": "Training",
+      "summary": "Better at teaching the same class; worse outside it.",
+      "systems": [
+        "Training"
+      ],
+      "detail": [
+        "Exact-class teaching fit is 1.55 instead of 1.3.",
+        "Other fits are multiplied by 0.7 unless A Broad Hand takes precedence."
+      ]
+    }
+  },
+  {
+    "id": "old-soldier",
+    "name": "Old Soldier",
+    "type": "positive",
+    "desc": "Hardened veteran who has seen it all",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "old-voice",
+    "name": "Old Voice",
+    "type": "positive",
+    "desc": "Respected presence that calms younger comrades and reduces party panic.",
+    "tag": "Social",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "pathfinder",
+    "name": "Pathfinder",
+    "type": "positive",
+    "desc": "Guides the party safely through treacherous dungeon paths",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "peacemaker",
+    "name": "Peacemaker",
+    "type": "positive",
+    "desc": "Calms campfire disputes, preventing party friction and morale drops.",
+    "tag": "Social",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "professional",
+    "name": "Professional",
+    "type": "positive",
+    "desc": "Treats dungeoneering with utmost tactical seriousness",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "recklessness": -0.1,
+      "discipline": 0.15,
+      "killHunger": -0.1
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "quick-to-mend",
+    "name": "Quick to Mend",
+    "type": "positive",
+    "desc": "Heals wounds and injuries twice as fast",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "quick-witted",
+    "name": "Quick Witted",
+    "type": "positive",
+    "desc": "Rapid learner who absorbs tactical feedback immediately",
+    "tag": "Contracts",
+    "behaviorEffect": null,
+    "nonCombat": {
+      "tag": "Contracts",
+      "summary": "Reads a dungeon fast — valued on Gear Hunt contracts, though it doesn't change any combat or attribute rolls.",
+      "systems": [
+        "Contracts"
+      ],
+      "detail": [
+        "Liked by Gear Hunt (relic) contracts: each matching hero adds +0.05 to job suitability, nudging the outcome tier, payout and renown.",
+        "Its listed Decisions / Anticipation are display flavour only — no event, puzzle or stat roll actually uses them.",
+        "Never rolls alongside Hot-Headed."
+      ]
+    }
+  },
+  {
+    "id": "reckless",
+    "name": "Reckless",
+    "type": "positive",
+    "desc": "Takes unnecessary risks that endanger the whole party",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "threatMult": 0.16,
+      "recklessness": 0.3,
+      "discipline": -0.2
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "restless",
+    "name": "Restless",
+    "type": "positive",
+    "desc": "Gets irritable if benched for more than a few days",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "recklessness": 0.08
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "road-hardened",
+    "name": "Road-Hardened",
+    "type": "positive",
+    "desc": "Endures long overland marches without suffering traveling fatigue.",
+    "tag": "Environment",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "shaken",
+    "name": "Shaken",
+    "type": "negative",
+    "desc": "Nerves frayed by past horrors (-15% Courage, +5% Steady).",
+    "tag": "Flaw",
+    "behaviorEffect": {
+      "courage": -0.15,
+      "steady": 0.05
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "slow-to-mend",
+    "name": "Slow to Mend",
+    "type": "positive",
+    "desc": "Takes far longer to recover from dungeon injuries",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "sore-loser",
+    "name": "Sore Loser",
+    "type": "positive",
+    "desc": "Suffers massive morale loss on defeats",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "stalwart",
+    "name": "Stalwart",
+    "type": "positive",
+    "desc": "Unmoving anchor for party formations",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "courage": 0.08
+    },
+    "nonCombat": {
+      "tag": "Events & jobs",
+      "summary": "The steadfast presence: unlocks brave outcomes at several dungeon events, is prized on Sellsword contracts, and can even be earned or granted by gear.",
+      "systems": [
+        "Dungeon events",
+        "Contracts",
+        "Acquisition"
+      ],
+      "detail": [
+        "The Quiet Shrine: opens the blessed branch (party stress -18).",
+        "The Whispering Idol: forces the good outcome even past a Greedy, Arrogant or Reckless party — gold and party stress -5.",
+        "The Echoing Tomb: unlocks the tomb-opening reward (gold + an item) even over Superstitious, Cowardly or Shaken heroes.",
+        "Liked by Sellsword contracts (+0.05 suitability). Earnable by completing the Standard-Bearer vow, or granted by Mythic/Legendary armour (Aegis of the Steadfast, Mantle of Resolve).",
+        "Note: gear-granted Stalwart only feeds combat and the UI — the event and contract perks check the hero's own earned trait. Never rolls with Cowardly or Brittle."
+      ]
+    }
+  },
+  {
+    "id": "steady",
+    "name": "Steady",
+    "type": "positive",
+    "desc": "Reliable under all combat conditions",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "discipline": 0.08
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "stoic",
+    "name": "Stoic",
+    "type": "positive",
+    "desc": "Endures pain and hardship without losing focus",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "courage": 0.12,
+      "recklessness": -0.06,
+      "poise": -0.03,
+      "steady": -0.04
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "stone-still",
+    "name": "Stone-Still",
+    "type": "positive",
+    "desc": "Immovable composure when ambushed or surrounded by enemy forces.",
+    "tag": "Combat AI",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "streaky",
+    "name": "Streaky",
+    "type": "positive",
+    "desc": "Wildly inconsistent form—brilliant one day, awful the next",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "sun-warmed",
+    "name": "Sun-Warmed",
+    "type": "positive",
+    "desc": "High spirits and increased movement speed when fighting in open biomes.",
+    "tag": "Environment",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "superstitious",
+    "name": "Superstitious",
+    "type": "positive",
+    "desc": "Performs rituals before opening chests or doors",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "courage": -0.1
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "sure-footed",
+    "name": "Sure Footed",
+    "type": "positive",
+    "desc": "Immune to trip hazards and rough terrain stumbling",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "recklessness": -0.1,
+      "luck": 0.12
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "tally-keeper",
+    "name": "Tally-Keeper",
+    "type": "positive",
+    "desc": "Meticulously tallies slain foes, earning bonus guild renown on contracts.",
+    "tag": "Guild",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "team-player",
+    "name": "Team Player",
+    "type": "positive",
+    "desc": "Maximizes bond gains and synergy power",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "protectiveness": 0.4
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "thick-skinned",
+    "name": "Thick Skinned",
+    "type": "positive",
+    "desc": "Reduces damage received from physical blows",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "thrifty",
+    "name": "Thrifty",
+    "type": "positive",
+    "desc": "Maintains equipment carefully to save gold",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "tireless",
+    "name": "Tireless",
+    "type": "positive",
+    "desc": "Rarely suffers from expedition fatigue",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "threatMult": 0.04,
+      "discipline": 0.12
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "traditional",
+    "name": "Traditional",
+    "type": "positive",
+    "desc": "Prefers standard ancient techniques over new tactics",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "discipline": 0.06,
+      "killHunger": -0.05
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "trap-wise",
+    "name": "Trap Wise",
+    "type": "positive",
+    "desc": "Easily spots hidden pressure plates and dungeon snares",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "unbreakable",
+    "name": "Unbreakable",
+    "type": "positive",
+    "desc": "Body and spirit cannot be broken by dungeon despair",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "threatMult": 0.1,
+      "courage": 0.25
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "unforgiving",
+    "name": "Unforgiving",
+    "type": "positive",
+    "desc": "Holds grudges against allies who make tactical mistakes",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "vain",
+    "name": "Vain",
+    "type": "positive",
+    "desc": "Obsessed with appearances over substance",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "recklessness": 0.12,
+      "killHunger": 0.3,
+      "protectiveness": -0.3
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "vigilant",
+    "name": "Vigilant",
+    "type": "positive",
+    "desc": "Never ambushed or caught unprepared",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "recklessness": -0.09,
+      "discipline": 0.1
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "watchful",
+    "name": "Watchful",
+    "type": "positive",
+    "desc": "Keeps an eye on the shadows at all times",
+    "tag": "Combat AI",
+    "behaviorEffect": {
+      "recklessness": -0.07
+    },
+    "nonCombat": null
+  },
+  {
+    "id": "weathered",
+    "name": "Weathered",
+    "type": "positive",
+    "desc": "Seasoned traveler hardened to all elements",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  },
+  {
+    "id": "well-preserved",
+    "name": "Well Preserved",
+    "type": "positive",
+    "desc": "Ages gracefully with minimal attribute decline",
+    "tag": "General",
+    "behaviorEffect": null,
+    "nonCombat": null
+  }
 ];
 
 export const RARITIES = ['common', 'rare', 'epic', 'legendary'];

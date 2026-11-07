@@ -274,12 +274,16 @@ export const HeroModal: React.FC<HeroModalProps> = ({
     const locName = getTraitName(traitItem.id, traitItem.name).toLowerCase();
     const locDesc = getTraitDesc(traitItem.id, traitItem.desc).toLowerCase();
     const searchLower = traitSearch.toLowerCase();
+    const behaviorKeys = traitItem.behaviorEffect ? Object.keys(traitItem.behaviorEffect).join(' ').toLowerCase() : '';
+    const tagLower = traitItem.tag ? traitItem.tag.toLowerCase() : '';
     const matchesSearch =
       locName.includes(searchLower) ||
       locDesc.includes(searchLower) ||
       traitItem.name.toLowerCase().includes(searchLower) ||
       traitItem.id.toLowerCase().includes(searchLower) ||
-      traitItem.desc.toLowerCase().includes(searchLower);
+      traitItem.desc.toLowerCase().includes(searchLower) ||
+      behaviorKeys.includes(searchLower) ||
+      tagLower.includes(searchLower);
     const matchesFilter = traitFilter === 'all' || traitItem.type === traitFilter;
     return matchesSearch && matchesFilter;
   });
@@ -822,10 +826,15 @@ export const HeroModal: React.FC<HeroModalProps> = ({
                       >
                         <div>
                           <div className="flex items-center justify-between gap-1 mb-1">
-                            <span className="font-semibold text-xs text-[#f0e8db]">
+                            <span className="font-semibold text-xs text-[#f0e8db] truncate">
                               {traitName}
                             </span>
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-1 shrink-0">
+                              {traitItem.tag && (
+                                <span className="text-[9px] px-1 py-0.2 rounded bg-[#2a2233] text-[#c2b6cb] font-mono">
+                                  {traitItem.tag}
+                                </span>
+                              )}
                               <span
                                 className={`text-[9px] uppercase px-1.5 py-0.2 rounded border font-sans font-bold ${typeBadge}`}
                               >
@@ -843,6 +852,28 @@ export const HeroModal: React.FC<HeroModalProps> = ({
                           <p className="text-[11px] text-[#8e8273] line-clamp-2 leading-relaxed">
                             {traitDesc}
                           </p>
+
+                          {/* Combat AI parameters badge chips */}
+                          {traitItem.behaviorEffect && (
+                            <div className="mt-1.5 pt-1.5 border-t border-[#2b2438]/50 flex flex-wrap gap-1">
+                              {Object.entries(traitItem.behaviorEffect).map(([k, v]) => {
+                                const pct = Math.round(v * 100);
+                                const isPos = pct > 0;
+                                return (
+                                  <span
+                                    key={k}
+                                    className={`text-[9px] font-mono px-1 py-0.2 rounded ${
+                                      isPos
+                                        ? 'bg-[#22c55e]/15 text-[#4ade80]'
+                                        : 'bg-[#ef4444]/15 text-[#f87171]'
+                                    }`}
+                                  >
+                                    {k}: {pct > 0 ? `+${pct}%` : `${pct}%`}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
                       </button>
                     );
