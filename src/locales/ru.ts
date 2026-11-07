@@ -355,7 +355,7 @@ export const ru: TranslationSchema = {
     'Приложение автоматически проверяет официальные выпуски на GitHub Releases при запуске. Вы также можете проверить обновления вручную.',
   checkUpdatesBtn: 'Проверить обновления сейчас',
   checkingUpdatesStatus: 'Проверка GitHub Releases...',
-  upToDateStatus: 'У вас установлена последняя версия (v1.0.0).',
+  upToDateStatus: 'У вас установлена последняя версия.',
   updateAvailableTitle: 'Доступно обновление',
   updateAvailableSubtitle: 'Опубликована новая версия программы',
   releaseNotesTitle: 'Примечания к выпуску:',

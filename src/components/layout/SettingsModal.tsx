@@ -14,6 +14,7 @@ import { Button } from '../ui/Button';
 import { isTauri, listGameBackups, BackupFileInfo } from '../../lib/tauri';
 import { checkForUpdate, UpdateInfo } from '../../lib/updater';
 import { useTranslation } from '../../lib/i18n';
+import { APP_VERSION } from '../../lib/constants';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -171,7 +172,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <span>{t.updaterSectionTitle}</span>
               </div>
               <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-[#1f1726] border border-[#3f2e4d] text-[#e8d5be]">
-                v1.0.0
+                v{APP_VERSION}
               </span>
             </div>
             <p className="text-[11px] text-[#8e8070] leading-relaxed">

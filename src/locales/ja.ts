@@ -355,7 +355,7 @@ export const ja: TranslationSchema = {
     '起動時に GitHub Releases から公式アップデートを自動的に確認します。いつでも手動で確認することも可能です。',
   checkUpdatesBtn: '今すぐアップデートを確認',
   checkingUpdatesStatus: 'GitHub Releases を確認中...',
-  upToDateStatus: '最新バージョン (v1.0.0) を使用しています。',
+  upToDateStatus: '最新バージョンを使用しています。',
   updateAvailableTitle: 'アップデートが利用可能',
   updateAvailableSubtitle: '新しいバージョンが公開されました',
   releaseNotesTitle: 'リリースノート:',

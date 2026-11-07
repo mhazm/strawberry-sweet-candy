@@ -355,7 +355,7 @@ export const de: TranslationSchema = {
     'Die Anwendung prüft beim Start automatisch auf offizielle GitHub Releases. Sie können auch jederzeit manuell suchen.',
   checkUpdatesBtn: 'Jetzt nach Updates suchen',
   checkingUpdatesStatus: 'Prüfe GitHub Releases...',
-  upToDateStatus: 'Sie verwenden die neueste Version (v1.0.0).',
+  upToDateStatus: 'Sie verwenden die neueste Version.',
   updateAvailableTitle: 'Update verfügbar',
   updateAvailableSubtitle: 'Eine neue Version wurde veröffentlicht',
   releaseNotesTitle: 'Versionshinweise:',

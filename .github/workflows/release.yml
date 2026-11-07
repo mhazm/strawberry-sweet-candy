@@ -50,18 +50,29 @@ jobs:
           releaseBody: |
             ## 🛡️ Dungeons & Dynasties Save Game Editor ${{ github.ref_name }}
 
-            ### ✨ Highlights:
-            - Full Guild treasury, renown, mode toggles, and staff management
-            - Delver roster editor with 30 combat attributes and 7 hidden FM traits
-            - Wonderkid generator with class-key optimization
-            - Safe dedicated backup system in `%APPDATA%\dnd-saveeditor\editor-backups\`
-            - Full multi-language localization across 8 languages
-            - Built-in automatic self-updater
+            ### ✨ What's New in v1.1.0:
+            - **⚔️ Party Synergy Planner**: Live evaluation of all 11 official class synergies with party damage, healing, and mitigation calculation, active/inactive synergy views, and 4-hero squad auto-recommender.
+            - **🧭 Dungeon Condition Scout**: Full hazard reconnaissance for Flooded, Pitch Dark, Cursed Ground, Deep Cold, Infernal Heat, and Numbing Frost. Scans active counter gear & traits across roster and stash, offering readiness grading and squad deployment.
+            - **🛡️ Datamined Equipment Forge & Vault Editor**: Complete loot generation engine from v3.0.0 datamine:
+              - 4 Rarity Tiers (Common 80%, Rare 16%, Mythic 3.5%, Legendary 0.5%)
+              - 7 Quality Band Multipliers (Cursed x-1.0, Flawed x0.55, Worn x0.75, Potent x1.0, Vaunted x1.25, Exalted x1.45, Sovereign x1.80)
+              - 11 Trait-granting Relic gear items (Lone Wolf, Reckless, Stalwart, Brave, Iron-Willed, Arrogant, Greedy)
+              - 6 Environmental condition counter items
+              - 24 Minor Trinkets catalog
+              - Curated combat stat selectors with human-readable descriptions
+              - 5 Role-based stat presets (DPS, Tank, Healer, Assassin, Sovereign God-Roll)
+            - **✨ Expanded 110-Trait Database**: Datamined combat behavior parameters (courage, recklessness, threatMult, luck) and nonCombat event details.
+            - **🎯 Role-Based Trait Recommendations**: Suggested traits and 1-click optimal builds for Tanks, DPS, and Healers with counterproductive flaw warnings.
+            - **🎒 Guild Vault Equipment Integration**: Delvers can equip items directly from the vault in Hero Modal.
+            - **🐛 Bug Fixes & Refinements**:
+              - Fixed Unix epoch timestamp display (1970 bug) in save backup manager.
+              - Full 8-language localization across all new views and modals (EN, ID, ZH, DE, JA, ES, RU, FR).
+              - Offline embedded production assets for standalone desktop execution.
 
-            ### 📦 Installers & Standalone:
-            - **NSIS Setup**: `...setup.exe`
-            - **Windows MSI**: `...x64.msi`
-            - **Auto-Updater Manifest**: `latest.json`
+            ### 📦 Installers & Update Manifest:
+            - **Windows NSIS Setup**: `dndeditor_${{ github.ref_name }}_x64-setup.exe`
+            - **Windows MSI Installer**: `dndeditor_${{ github.ref_name }}_x64_en-US.msi`
+            - **Auto-Updater Manifest**: `latest.json` + signature bundle
           releaseDraft: false
           prerelease: false
 

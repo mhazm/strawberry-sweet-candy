@@ -355,7 +355,7 @@ export const zh: TranslationSchema = {
     '本应用在启动时会自动从 GitHub Releases 检查官方更新。您也可以随时手动检查。',
   checkUpdatesBtn: '立即检查更新',
   checkingUpdatesStatus: '正在检查 GitHub Releases...',
-  upToDateStatus: '您正在使用最新版本 (v1.0.0)。',
+  upToDateStatus: '您正在使用最新版本。',
   updateAvailableTitle: '发现新版本',
   updateAvailableSubtitle: '已有新版本公开发布',
   releaseNotesTitle: '更新日志：',

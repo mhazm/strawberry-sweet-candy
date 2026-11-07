@@ -355,7 +355,7 @@ export const es: TranslationSchema = {
     'La aplicación busca actualizaciones oficiales en GitHub Releases al iniciarse. También puede comprobarlo manualmente en cualquier momento.',
   checkUpdatesBtn: 'Buscar actualizaciones ahora',
   checkingUpdatesStatus: 'Comprobando GitHub Releases...',
-  upToDateStatus: 'Está utilizando la última versión (v1.0.0).',
+  upToDateStatus: 'Está utilizando la última versión.',
   updateAvailableTitle: 'Actualización disponible',
   updateAvailableSubtitle: 'Se ha publicado una nueva versión',
   releaseNotesTitle: 'Notas de la versión:',

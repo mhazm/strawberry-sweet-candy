@@ -1,3 +1,5 @@
+export const APP_VERSION = '1.1.0';
+
 export interface StatMeta {
   key: string;
   name: string;
