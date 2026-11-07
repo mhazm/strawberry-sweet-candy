@@ -2,7 +2,7 @@
 
 A save editor for Dungeons & Dynasties by Bretticus82. Built with Tauri v2, React 19, TypeScript, and Tailwind CSS.
 
-![D&D Save Editor](public/shield.svg)
+![D&D Save Editor](public/dnd.jpg)
 
 ---
 
