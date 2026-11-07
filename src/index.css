@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-cinzel: 'Cinzel', serif;
+  }
+}
+
+.font-rpg {
+  font-family: 'Cinzel', serif;
+}
+
+body {
+  background-color: #131017;
+  color: #c9bea9;
+}
+
+/* In-Game Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #110d14;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a212f;
+  border-radius: 4px;
+  border: 1px solid #3b2c21;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4a3825;
+}
