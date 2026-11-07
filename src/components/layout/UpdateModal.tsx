@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Sparkles, Download, CheckCircle, AlertCircle, RefreshCw, X } from 'lucide-react';
+import { Sparkles, Download, AlertCircle, RefreshCw, X } from 'lucide-react';
 import { UpdateInfo, installUpdate } from '../../lib/updater';
+import { useTranslation } from '../../lib/i18n';
 import { Button } from '../ui/Button';
 
 interface UpdateModalProps {
@@ -9,6 +10,7 @@ interface UpdateModalProps {
 }
 
 export const UpdateModal: React.FC<UpdateModalProps> = ({ updateInfo, onClose }) => {
+  const { t } = useTranslation();
   const [isInstalling, setIsInstalling] = useState(false);
   const [progressPercent, setProgressPercent] = useState<number>(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -22,7 +24,7 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({ updateInfo, onClose })
       });
     } catch (err: any) {
       console.error('Update failed:', err);
-      setErrorMessage(err?.message || 'Gagal mengunduh pembaruan. Silakan coba lagi nanti.');
+      setErrorMessage(err?.message || t.updateFailedError);
       setIsInstalling(false);
     }
   };
@@ -38,9 +40,9 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({ updateInfo, onClose })
             </div>
             <div>
               <h2 className="font-serif font-bold text-sm tracking-wide text-[#f5cb71]">
-                Pembaruan Tersedia
+                {t.updateAvailableTitle}
               </h2>
-              <p className="text-[10px] text-[#9c8e7e]">Versi baru telah dirilis ke publik</p>
+              <p className="text-[10px] text-[#9c8e7e]">{t.updateAvailableSubtitle}</p>
             </div>
           </div>
           {!isInstalling && (
@@ -70,7 +72,7 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({ updateInfo, onClose })
           {updateInfo.body && (
             <div className="space-y-1.5">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-[#dfb15b]">
-                Catatan Rilis:
+                {t.releaseNotesTitle}
               </span>
               <div className="max-h-36 overflow-y-auto p-3 bg-[#0d0910] border border-[#251a2b] rounded-lg text-[11px] leading-relaxed text-[#b5a796] whitespace-pre-wrap font-sans">
                 {updateInfo.body}
@@ -84,7 +86,7 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({ updateInfo, onClose })
               <div className="flex items-center justify-between text-[11px]">
                 <span className="text-[#dfb15b] flex items-center gap-1.5 font-medium">
                   <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  Sedang mengunduh dan memasang...
+                  {t.downloadingAndInstalling}
                 </span>
                 <span className="font-mono font-bold text-[#f5cb71]">{progressPercent}%</span>
               </div>
@@ -95,7 +97,7 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({ updateInfo, onClose })
                 />
               </div>
               <p className="text-[10px] text-[#786b5c] text-center italic">
-                Aplikasi akan otomatis restart setelah instalasi selesai.
+                {t.restartNotice}
               </p>
             </div>
           )}
@@ -114,7 +116,7 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({ updateInfo, onClose })
           {!isInstalling ? (
             <>
               <Button variant="ghost" size="sm" onClick={onClose}>
-                Nanti Saja
+                {t.updateLaterBtn}
               </Button>
               <Button
                 variant="primary"
@@ -123,13 +125,13 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({ updateInfo, onClose })
                 className="flex items-center gap-1.5 shadow-[0_0_15px_rgba(223,177,91,0.3)]"
               >
                 <Download className="w-3.5 h-3.5" />
-                Perbarui & Restart
+                {t.updateAndRestartBtn}
               </Button>
             </>
           ) : (
             <div className="text-[11px] text-[#8e806f] flex items-center gap-1.5 py-1">
               <span className="w-2 h-2 rounded-full bg-[#dfb15b] animate-ping" />
-              Proses instalasi sedang berjalan...
+              {t.installInProgress}
             </div>
           )}
         </div>
@@ -137,3 +139,4 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({ updateInfo, onClose })
     </div>
   );
 };
+

@@ -210,6 +210,23 @@ export const zh: TranslationSchema = {
   detectedSaves: '在 %APPDATA% 侦测到的游戏存档',
   close: '关闭',
 
+  // Auto-Updater & Software Updates
+  updaterSectionTitle: '软件更新（自动更新）',
+  updaterDesc:
+    '本应用在启动时会自动从 GitHub Releases 检查官方更新。您也可以随时手动检查。',
+  checkUpdatesBtn: '立即检查更新',
+  checkingUpdatesStatus: '正在检查 GitHub Releases...',
+  upToDateStatus: '您正在使用最新版本 (v1.0.0)。',
+  updateAvailableTitle: '发现新版本',
+  updateAvailableSubtitle: '已有新版本公开发布',
+  releaseNotesTitle: '更新日志：',
+  downloadingAndInstalling: '正在下载并安装更新...',
+  restartNotice: '安装完成后应用程序将自动重启。',
+  updateAndRestartBtn: '更新并重启',
+  updateLaterBtn: '稍后再说',
+  installInProgress: '正在安装中...',
+  updateFailedError: '下载更新失败，请稍后重试。',
+
   cheatsTitle: '快速作弊 / 上帝模式',
   godModeDesc: '一键修改公会与所有队员的属性与资源。',
   infiniteGold: '无限金库财富',

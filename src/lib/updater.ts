@@ -86,3 +86,4 @@ export async function installUpdate(onProgress?: DownloadProgressCallback): Prom
     console.error('[AutoUpdater] Failed to relaunch application:', err);
   }
 }
+

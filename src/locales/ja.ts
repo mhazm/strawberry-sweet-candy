@@ -210,6 +210,23 @@ export const ja: TranslationSchema = {
   detectedSaves: '%APPDATA% から検出されたセーブ',
   close: '閉じる',
 
+  // Auto-Updater & Software Updates
+  updaterSectionTitle: 'アプリの更新 (自動アップデート)',
+  updaterDesc:
+    '起動時に GitHub Releases から公式アップデートを自動的に確認します。いつでも手動で確認することも可能です。',
+  checkUpdatesBtn: '今すぐアップデートを確認',
+  checkingUpdatesStatus: 'GitHub Releases を確認中...',
+  upToDateStatus: '最新バージョン (v1.0.0) を使用しています。',
+  updateAvailableTitle: 'アップデートが利用可能',
+  updateAvailableSubtitle: '新しいバージョンが公開されました',
+  releaseNotesTitle: 'リリースノート:',
+  downloadingAndInstalling: 'アップデートをダウンロードしてインストール中...',
+  restartNotice: 'インストール完了後、アプリは自動的に再起動します。',
+  updateAndRestartBtn: '更新して再起動',
+  updateLaterBtn: '後で',
+  installInProgress: 'インストール処理が進行中です...',
+  updateFailedError: 'アップデートのダウンロードに失敗しました。後でもう一度お試しください。',
+
   cheatsTitle: 'クイックチート / 神モード',
   godModeDesc: 'ギルドや探検者全体をワンクリックで一括強化します。',
   infiniteGold: '無尽蔵の金貨',

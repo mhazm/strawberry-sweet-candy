@@ -62,10 +62,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           onUpdateFound(update);
         }
       } else {
-        setUpdateStatus('Aplikasi Anda sudah dalam versi terbaru (v1.0.0).');
+        setUpdateStatus(t.upToDateStatus);
       }
     } catch {
-      setUpdateStatus('Tidak dapat terhubung ke server pembaruan.');
+      setUpdateStatus(t.updateFailedError);
     } finally {
       setIsCheckingUpdate(false);
     }
@@ -168,14 +168,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-[#dfb15b] font-semibold text-xs">
                 <Sparkles className="w-4 h-4 text-[#dfb15b]" />
-                <span>Pembaruan Aplikasi (Auto-Update)</span>
+                <span>{t.updaterSectionTitle}</span>
               </div>
               <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-[#1f1726] border border-[#3f2e4d] text-[#e8d5be]">
                 v1.0.0
               </span>
             </div>
             <p className="text-[11px] text-[#8e8070] leading-relaxed">
-              Aplikasi ini otomatis memeriksa pembaruan resmi dari GitHub Releases saat dibuka. Anda juga dapat memeriksanya secara manual kapan saja.
+              {t.updaterDesc}
             </p>
             <div className="pt-1 flex flex-col gap-2">
               <Button
@@ -186,7 +186,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 className="w-full flex items-center justify-center gap-2"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isCheckingUpdate ? 'animate-spin text-[#dfb15b]' : ''}`} />
-                {isCheckingUpdate ? 'Memeriksa GitHub...' : 'Periksa Pembaruan Sekarang'}
+                {isCheckingUpdate ? t.checkingUpdatesStatus : t.checkUpdatesBtn}
               </Button>
               {updateStatus && (
                 <div className="flex items-center gap-1.5 text-[11px] text-[#4ade80] bg-[#4ade80]/10 border border-[#4ade80]/20 rounded-md px-2.5 py-1.5">

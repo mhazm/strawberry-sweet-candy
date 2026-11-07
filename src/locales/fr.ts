@@ -210,6 +210,23 @@ export const fr: TranslationSchema = {
   detectedSaves: 'Sauvegardes détectées dans %APPDATA%',
   close: 'Fermer',
 
+  // Auto-Updater & Software Updates
+  updaterSectionTitle: 'Mises à jour logicielles (Auto-Update)',
+  updaterDesc:
+    "L'application vérifie automatiquement les publications officielles sur GitHub Releases au démarrage. Vous pouvez également vérifier manuellement à tout moment.",
+  checkUpdatesBtn: 'Vérifier les mises à jour maintenant',
+  checkingUpdatesStatus: 'Vérification sur GitHub Releases...',
+  upToDateStatus: 'Vous utilisez la dernière version (v1.0.0).',
+  updateAvailableTitle: 'Mise à jour disponible',
+  updateAvailableSubtitle: 'Une nouvelle version a été publiée',
+  releaseNotesTitle: 'Notes de version :',
+  downloadingAndInstalling: 'Téléchargement et installation de la mise à jour...',
+  restartNotice: "L'application redémarrera automatiquement une fois l'installation terminée.",
+  updateAndRestartBtn: 'Mettre à jour et redémarrer',
+  updateLaterBtn: 'Plus tard',
+  installInProgress: 'Installation en cours...',
+  updateFailedError: 'Échec du téléchargement de la mise à jour. Veuillez réessayer plus tard.',
+
   cheatsTitle: 'Triches Rapides / Mode Divin',
   godModeDesc: 'Modifications en un clic pour sublimer votre guilde et vos aventuriers.',
   infiniteGold: 'Trésor d\'Or Infini',

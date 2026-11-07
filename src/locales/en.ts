@@ -214,6 +214,23 @@ export const en: TranslationSchema = {
   detectedSaves: 'Detected Game Saves in %APPDATA%',
   close: 'Close',
 
+  // Auto-Updater & Software Updates
+  updaterSectionTitle: 'Software Updates (Auto-Update)',
+  updaterDesc:
+    'The application automatically checks for official GitHub Releases upon startup. You can also trigger a manual check anytime.',
+  checkUpdatesBtn: 'Check for Updates Now',
+  checkingUpdatesStatus: 'Checking GitHub Releases...',
+  upToDateStatus: 'You are using the latest version (v1.0.0).',
+  updateAvailableTitle: 'Update Available',
+  updateAvailableSubtitle: 'A new version has been released to the public',
+  releaseNotesTitle: 'Release Notes:',
+  downloadingAndInstalling: 'Downloading and installing update...',
+  restartNotice: 'The application will automatically restart once the installation finishes.',
+  updateAndRestartBtn: 'Update & Restart',
+  updateLaterBtn: 'Later',
+  installInProgress: 'Installation is currently in progress...',
+  updateFailedError: 'Failed to download and install update. Please try again later.',
+
   cheatsTitle: 'Quick Cheats / God Mode',
   godModeDesc: 'One-click modifications to power up your guild and delvers.',
   infiniteGold: 'Infinite Treasury Gold',

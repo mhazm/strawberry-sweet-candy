@@ -210,6 +210,23 @@ export const ru: TranslationSchema = {
   detectedSaves: 'Найденные сохранения в %APPDATA%',
   close: 'Закрыть',
 
+  // Auto-Updater & Software Updates
+  updaterSectionTitle: 'Обновление программы (Автообновление)',
+  updaterDesc:
+    'Приложение автоматически проверяет официальные выпуски на GitHub Releases при запуске. Вы также можете проверить обновления вручную.',
+  checkUpdatesBtn: 'Проверить обновления сейчас',
+  checkingUpdatesStatus: 'Проверка GitHub Releases...',
+  upToDateStatus: 'У вас установлена последняя версия (v1.0.0).',
+  updateAvailableTitle: 'Доступно обновление',
+  updateAvailableSubtitle: 'Опубликована новая версия программы',
+  releaseNotesTitle: 'Примечания к выпуску:',
+  downloadingAndInstalling: 'Загрузка и установка обновления...',
+  restartNotice: 'Приложение автоматически перезапустится после завершения установки.',
+  updateAndRestartBtn: 'Обновить и перезапустить',
+  updateLaterBtn: 'Позже',
+  installInProgress: 'Идет установка...',
+  updateFailedError: 'Не удалось загрузить обновление. Попробуйте позже.',
+
   cheatsTitle: 'Быстрые читы / Режим Творца',
   godModeDesc: 'Модификации в один клик для усиления гильдии и всего состава.',
   infiniteGold: 'Неисчерпаемая казна',

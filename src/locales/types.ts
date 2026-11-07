@@ -237,6 +237,22 @@ export interface TranslationSchema {
   detectedSaves: string;
   close: string;
 
+  // Auto-Updater & Software Updates
+  updaterSectionTitle: string;
+  updaterDesc: string;
+  checkUpdatesBtn: string;
+  checkingUpdatesStatus: string;
+  upToDateStatus: string;
+  updateAvailableTitle: string;
+  updateAvailableSubtitle: string;
+  releaseNotesTitle: string;
+  downloadingAndInstalling: string;
+  restartNotice: string;
+  updateAndRestartBtn: string;
+  updateLaterBtn: string;
+  installInProgress: string;
+  updateFailedError: string;
+
   // Cheats
   cheatsTitle: string;
   godModeDesc: string;

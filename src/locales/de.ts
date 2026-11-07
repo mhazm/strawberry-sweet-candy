@@ -210,6 +210,23 @@ export const de: TranslationSchema = {
   detectedSaves: 'Erkannte Spielstände in %APPDATA%',
   close: 'Schließen',
 
+  // Auto-Updater & Software Updates
+  updaterSectionTitle: 'Software-Aktualisierung (Auto-Update)',
+  updaterDesc:
+    'Die Anwendung prüft beim Start automatisch auf offizielle GitHub Releases. Sie können auch jederzeit manuell suchen.',
+  checkUpdatesBtn: 'Jetzt nach Updates suchen',
+  checkingUpdatesStatus: 'Prüfe GitHub Releases...',
+  upToDateStatus: 'Sie verwenden die neueste Version (v1.0.0).',
+  updateAvailableTitle: 'Update verfügbar',
+  updateAvailableSubtitle: 'Eine neue Version wurde veröffentlicht',
+  releaseNotesTitle: 'Versionshinweise:',
+  downloadingAndInstalling: 'Update wird heruntergeladen und installiert...',
+  restartNotice: 'Die Anwendung wird nach Abschluss der Installation automatisch neu gestartet.',
+  updateAndRestartBtn: 'Aktualisieren & Neustarten',
+  updateLaterBtn: 'Später',
+  installInProgress: 'Installation läuft...',
+  updateFailedError: 'Fehler beim Herunterladen des Updates. Bitte versuchen Sie es später erneut.',
+
   cheatsTitle: 'Schnell-Cheats / God Mode',
   godModeDesc: 'Direkte Modifikationen für Ihre Gilde und Kämpfer.',
   infiniteGold: 'Unendliches Gold',

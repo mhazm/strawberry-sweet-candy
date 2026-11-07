@@ -210,6 +210,23 @@ export const es: TranslationSchema = {
   detectedSaves: 'Partidas detectadas en %APPDATA%',
   close: 'Cerrar',
 
+  // Auto-Updater & Software Updates
+  updaterSectionTitle: 'Actualizaciones de software (Auto-Update)',
+  updaterDesc:
+    'La aplicación busca actualizaciones oficiales en GitHub Releases al iniciarse. También puede comprobarlo manualmente en cualquier momento.',
+  checkUpdatesBtn: 'Buscar actualizaciones ahora',
+  checkingUpdatesStatus: 'Comprobando GitHub Releases...',
+  upToDateStatus: 'Está utilizando la última versión (v1.0.0).',
+  updateAvailableTitle: 'Actualización disponible',
+  updateAvailableSubtitle: 'Se ha publicado una nueva versión',
+  releaseNotesTitle: 'Notas de la versión:',
+  downloadingAndInstalling: 'Descargando e instalando actualización...',
+  restartNotice: 'La aplicación se reiniciará automáticamente una vez finalizada la instalación.',
+  updateAndRestartBtn: 'Actualizar y reiniciar',
+  updateLaterBtn: 'Más tarde',
+  installInProgress: 'Instalación en curso...',
+  updateFailedError: 'Error al descargar la actualización. Inténtelo de nuevo más tarde.',
+
   cheatsTitle: 'Trucos Rápidos / Modo Dios',
   godModeDesc: 'Modificaciones inmediatas para impulsar tu gremio y aventureros.',
   infiniteGold: 'Tesoro de Oro Infinito',

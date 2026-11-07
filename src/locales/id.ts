@@ -214,6 +214,23 @@ export const id: TranslationSchema = {
   detectedSaves: 'Save Game Terdeteksi di %APPDATA%',
   close: 'Tutup',
 
+  // Auto-Updater & Software Updates
+  updaterSectionTitle: 'Pembaruan Aplikasi (Auto-Update)',
+  updaterDesc:
+    'Aplikasi ini otomatis memeriksa pembaruan resmi dari GitHub Releases saat dibuka. Anda juga dapat memeriksanya secara manual kapan saja.',
+  checkUpdatesBtn: 'Periksa Pembaruan Sekarang',
+  checkingUpdatesStatus: 'Memeriksa GitHub Releases...',
+  upToDateStatus: 'Aplikasi Anda sudah dalam versi terbaru (v1.0.0).',
+  updateAvailableTitle: 'Pembaruan Tersedia',
+  updateAvailableSubtitle: 'Versi baru telah dirilis ke publik',
+  releaseNotesTitle: 'Catatan Rilis:',
+  downloadingAndInstalling: 'Sedang mengunduh dan memasang pembaruan...',
+  restartNotice: 'Aplikasi akan otomatis restart setelah instalasi selesai.',
+  updateAndRestartBtn: 'Perbarui & Restart',
+  updateLaterBtn: 'Nanti Saja',
+  installInProgress: 'Proses instalasi sedang berjalan...',
+  updateFailedError: 'Gagal mengunduh pembaruan. Silakan coba lagi nanti.',
+
   cheatsTitle: 'Cheat Cepat / Mode Dewa',
   godModeDesc: 'Modifikasi satu klik untuk memperkuat guild dan para delver.',
   infiniteGold: 'Kas Emas Tak Terbatas',
