@@ -44,11 +44,20 @@ import { StatSlider } from './StatSlider';
 import { RaceInfoTooltip } from './RaceInfoTooltip';
 import { useTranslation } from '../../lib/i18n';
 import { Tooltip } from '../ui/Tooltip';
+import {
+  EQUIPMENT_TEMPLATES,
+  QUALITY_BANDS,
+  RARITY_CONFIGS,
+  getQualityBandFromMultiplier,
+  calculateEquipmentStats,
+  calculateItemValue,
+} from '../../lib/equipment';
 
 interface HeroModalProps {
   hero: Adventurer;
   isOpen: boolean;
   initialTab?: 'attributes' | 'hidden' | 'health' | 'traits' | 'equipment';
+  stash?: EquipmentItem[];
   onClose: () => void;
   onSave: (updated: Adventurer) => void;
 }
@@ -57,6 +66,7 @@ export const HeroModal: React.FC<HeroModalProps> = ({
   hero,
   isOpen,
   initialTab = 'attributes',
+  stash = [],
   onClose,
   onSave,
 }) => {
@@ -218,77 +228,94 @@ export const HeroModal: React.FC<HeroModalProps> = ({
   };
 
   const createDefaultItem = (slot: 'weapon' | 'armour' | 'trinket') => {
-    const id = `it_${slot}_${Date.now()}`;
+    let tmpl = EQUIPMENT_TEMPLATES.find((t) => t.slot === slot);
+
     if (slot === 'weapon') {
-      return {
-        id,
-        name: `${form.classId.toUpperCase()} Relic Blade`,
-        slot: 'weapon',
-        rarity: 'rare',
-        weaponKind: form.role === 'healer' ? 'spell' : 'melee',
-        tier: 4,
-        quality: 1.25,
-        value: 180,
-        mods: {
-          attackPct: 0.2,
-          accuracy: 5,
-        },
-      } as EquipmentItem;
+      if (form.classId === 'arcanist') {
+        tmpl = EQUIPMENT_TEMPLATES.find((t) => t.id === 'stormcallers_rod') || tmpl;
+      } else if (form.classId === 'cleric') {
+        tmpl = EQUIPMENT_TEMPLATES.find((t) => t.id === 'channeling_wand') || tmpl;
+      } else if (form.classId === 'ranger') {
+        tmpl = EQUIPMENT_TEMPLATES.find((t) => t.id === 'recurve_bow') || tmpl;
+      } else if (form.classId === 'bard') {
+        tmpl = EQUIPMENT_TEMPLATES.find((t) => t.id === 'travellers_harp') || tmpl;
+      } else if (form.classId === 'guardian') {
+        tmpl = EQUIPMENT_TEMPLATES.find((t) => t.id === 'heavy_maul') || tmpl;
+      } else if (form.classId === 'warden') {
+        tmpl = EQUIPMENT_TEMPLATES.find((t) => t.id === 'balanced_spear') || tmpl;
+      } else {
+        tmpl = EQUIPMENT_TEMPLATES.find((t) => t.id === 'keen_blade') || tmpl;
+      }
+    } else if (slot === 'armour') {
+      if (form.role === 'tank') {
+        tmpl = EQUIPMENT_TEMPLATES.find((t) => t.id === 'bulwark_harness') || tmpl;
+      } else if (form.role === 'healer') {
+        tmpl = EQUIPMENT_TEMPLATES.find((t) => t.id === 'warded_vestments') || tmpl;
+      } else {
+        tmpl = EQUIPMENT_TEMPLATES.find((t) => t.id === 'skirmishers_jack') || tmpl;
+      }
+    } else {
+      if (form.role === 'healer') {
+        tmpl = EQUIPMENT_TEMPLATES.find((t) => t.id === 'sigil_of_focus') || tmpl;
+      } else if (form.role === 'tank') {
+        tmpl = EQUIPMENT_TEMPLATES.find((t) => t.id === 'guardians_seal') || tmpl;
+      } else {
+        tmpl = EQUIPMENT_TEMPLATES.find((t) => t.id === 'lucky_charm') || tmpl;
+      }
     }
-    if (slot === 'armour') {
-      return {
-        id,
-        name: 'Reinforced Citadel Plate',
-        slot: 'armour',
-        rarity: 'rare',
-        tier: 4,
-        quality: 1.25,
-        value: 160,
-        mods: {
-          mitigation: 0.08,
-          hpPct: 0.15,
-        },
-      } as EquipmentItem;
-    }
-    return {
-      id,
-      name: 'Pendant of the Deeps',
-      slot: 'trinket',
-      rarity: 'rare',
-      tier: 4,
-      quality: 1.25,
-      value: 140,
-      mods: {
-        critChance: 0.05,
-        speed: 3,
-      },
-    } as EquipmentItem;
+
+    const targetTier = 5;
+    const targetQuality = 1.8; // Sovereign quality multiplier
+    const mods = tmpl
+      ? calculateEquipmentStats(tmpl, 'legendary', targetQuality, targetTier)
+      : { attackPct: 0.35, critChance: 0.15 };
+    const val = calculateItemValue('legendary', targetTier, targetQuality);
+
+    const newItem: EquipmentItem = {
+      id: `it_${slot}_${Date.now()}`,
+      name: tmpl ? tmpl.names[0] : `${form.classId} Blade`,
+      slot,
+      rarity: 'legendary',
+      tier: targetTier,
+      quality: targetQuality,
+      value: val,
+      mods,
+    };
+
+    if (tmpl?.weaponKind) newItem.weaponKind = tmpl.weaponKind;
+    if (tmpl?.counters) newItem.counters = tmpl.counters;
+    if (tmpl?.grantsTrait) newItem.grantsTrait = tmpl.grantsTrait;
+
+    return newItem;
   };
 
   const upgradeItemToLegendary = (slot: 'weapon' | 'armour' | 'trinket') => {
     const item = form.equipment?.[slot];
     if (!item) return;
-    const upgradedMods = { ...(item.mods || {}) };
-    if (slot === 'weapon') {
-      upgradedMods.attackPct = 0.35;
-      upgradedMods.critChance = 0.15;
-      upgradedMods.accuracy = 8;
-    } else if (slot === 'armour') {
-      upgradedMods.hpPct = 0.3;
-      upgradedMods.mitigation = 0.15;
-      upgradedMods.healTakenPct = 0.2;
-    } else {
-      upgradedMods.speed = 5;
-      upgradedMods.critDamage = 0.4;
+
+    const currentQuality = item.quality || 1.0;
+    const targetQuality = 1.8; // Sovereign multiplier
+    const targetTier = 5;
+    const scaledMods: Record<string, number> = {};
+
+    if (item.mods) {
+      for (const [k, v] of Object.entries(item.mods)) {
+        if (typeof v === 'number') {
+          const ratio = targetQuality / Math.max(0.1, currentQuality);
+          scaledMods[k] = Math.round(v * ratio * 1000) / 1000;
+        } else {
+          scaledMods[k] = v;
+        }
+      }
     }
 
     updateEquipment(slot, {
       ...item,
       rarity: 'legendary',
-      tier: 5,
-      quality: 2.0,
-      value: (item.value || 100) * 3,
-      mods: upgradedMods,
+      tier: targetTier,
+      quality: targetQuality,
+      value: Math.max(item.value || 100, 2160),
+      mods: scaledMods,
     });
   };
 
@@ -1031,19 +1058,51 @@ export const HeroModal: React.FC<HeroModalProps> = ({
                         </div>
 
                         {!item ? (
-                          <div className="py-8 text-center text-xs text-[#8e8273] italic space-y-2">
-                            <p>{t.noGearEquipped}</p>
-                            <Button
-                              variant="secondary"
-                              size="sm"
-                              className="text-xs"
-                              icon={<Plus className="w-3 h-3" />}
-                              onClick={() =>
-                                updateEquipment(slot, createDefaultItem(slot))
-                              }
-                            >
-                              {t.equipSlot}
-                            </Button>
+                          <div className="py-6 text-center text-xs text-[#8e8273] space-y-3">
+                            <p className="italic">{t.noGearEquipped}</p>
+                            <div className="flex flex-col gap-2 items-center justify-center">
+                              <Button
+                                variant="gold"
+                                size="sm"
+                                className="text-xs"
+                                icon={<Plus className="w-3 h-3 text-[#151218]" />}
+                                onClick={() =>
+                                  updateEquipment(slot, createDefaultItem(slot))
+                                }
+                              >
+                                {t.equipSlot}
+                              </Button>
+
+                              {/* Equip from Guild Vault if available */}
+                              {stash.filter((s) => s.slot === slot).length > 0 && (
+                                <div className="w-full pt-2 border-t border-[#2d2333]/60">
+                                  <label className="text-[10px] text-[#8e8273] block mb-1">
+                                    {t.equipFromStash}
+                                  </label>
+                                  <select
+                                    defaultValue=""
+                                    onChange={(e) => {
+                                      const found = stash.find((s) => s.id === e.target.value);
+                                      if (found) {
+                                        updateEquipment(slot, { ...found });
+                                      }
+                                    }}
+                                    className="w-full bg-[#131018] border border-[#3b2e44] rounded px-2 py-1 text-xs text-[#dfb15b] focus:outline-none"
+                                  >
+                                    <option value="" disabled>
+                                      -- Select from Vault ({stash.filter((s) => s.slot === slot).length}) --
+                                    </option>
+                                    {stash
+                                      .filter((s) => s.slot === slot)
+                                      .map((stItem) => (
+                                        <option key={stItem.id} value={stItem.id}>
+                                          {stItem.name} ({stItem.rarity}, Tier {stItem.tier || 1})
+                                        </option>
+                                      ))}
+                                  </select>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         ) : (
                           <div className="mt-3 space-y-3 text-xs">
@@ -1064,6 +1123,37 @@ export const HeroModal: React.FC<HeroModalProps> = ({
                                 className="w-full bg-[#131018] border border-[#3b2e44] rounded px-2.5 py-1 text-[#f0e8db] font-semibold focus:outline-none focus:border-[#dfb15b]"
                               />
                             </div>
+
+                            {/* Quality Band & Special Tags */}
+                            {(() => {
+                              const qBand = getQualityBandFromMultiplier(item.quality || 1.0);
+                              return (
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <Tooltip content={`${qBand.description} (${qBand.odds} roll odds)`}>
+                                    <span
+                                      className="px-2 py-0.5 rounded text-[10px] font-mono font-bold border cursor-help"
+                                      style={{
+                                        backgroundColor: `${qBand.color}15`,
+                                        borderColor: `${qBand.color}40`,
+                                        color: qBand.color,
+                                      }}
+                                    >
+                                      {qBand.label} ({item.quality ? `${(item.quality * 100).toFixed(0)}%` : '100%'})
+                                    </span>
+                                  </Tooltip>
+                                  {item.counters && (
+                                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#0e2938] text-[#38bdf8] border border-[#1e4963]">
+                                      Counters {item.counters}
+                                    </span>
+                                  )}
+                                  {item.grantsTrait && (
+                                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#29172e] text-[#c084fc] border border-[#4d255c]">
+                                      Grants {item.grantsTrait}
+                                    </span>
+                                  )}
+                                </div>
+                              );
+                            })()}
 
                             {/* Rarity & Tier */}
                             <div className="grid grid-cols-2 gap-2">
@@ -1095,7 +1185,7 @@ export const HeroModal: React.FC<HeroModalProps> = ({
                                 <input
                                   type="number"
                                   min="1"
-                                  max="10"
+                                  max="5"
                                   value={item.tier || 1}
                                   onChange={(e) =>
                                     updateEquipment(slot, {

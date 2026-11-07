@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '../../lib/utils';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'emerald' | 'amber' | 'purple' | 'gold';
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'emerald' | 'amber' | 'purple' | 'gold' | 'cyan';
   size?: 'sm' | 'md' | 'lg';
   icon?: React.ReactNode;
 }
@@ -35,6 +35,8 @@ export const Button: React.FC<ButtonProps> = ({
       'bg-[#38161f] hover:bg-[#4a1c29] text-[#e67e8c] border border-[#632330] hover:border-[#852f40]',
     emerald:
       'bg-[#143023] hover:bg-[#1a3d2c] text-[#6bc79d] border border-[#21573d] hover:border-[#2f7850] shadow-[0_0_10px_rgba(33,87,61,0.2)]',
+    cyan:
+      'bg-[#12283a] hover:bg-[#18354c] text-[#70c7eb] border border-[#1f4a6b] hover:border-[#2d6691] shadow-[0_0_10px_rgba(31,74,107,0.2)]',
     ghost: 'hover:bg-[#201a14] text-[#8e8273] hover:text-[#e8decb]',
   };
 

@@ -319,6 +319,7 @@ export function App() {
                 <RosterView
                   roster={saveData.guild.roster || []}
                   recruits={saveData.guild.recruits || []}
+                  stash={saveData.guild.stash || []}
                   currentDay={saveData.guild.day || 1}
                   initialViewMode="roster"
                   onChange={handleUpdateRoster}
@@ -330,6 +331,7 @@ export function App() {
                 <RosterView
                   roster={saveData.guild.roster || []}
                   recruits={saveData.guild.recruits || []}
+                  stash={saveData.guild.stash || []}
                   currentDay={saveData.guild.day || 1}
                   initialViewMode="recruits"
                   onChange={handleUpdateRoster}

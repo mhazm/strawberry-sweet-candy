@@ -81,13 +81,15 @@ export interface EquipmentItem {
   id: string;
   name: string;
   slot: string; // 'weapon' | 'armour' | 'trinket'
-  rarity: string; // 'common' | 'rare' | 'epic' | 'legendary'
+  rarity: string; // 'common' | 'rare' | 'mythic' | 'legendary'
   mods?: Record<string, number>;
   weaponKind?: string;
   value?: number;
   tier?: number;
   quality?: number;
   counters?: string;
+  grantsTrait?: string;
+  favours?: string[];
 }
 
 export interface AdventurerEquipment {

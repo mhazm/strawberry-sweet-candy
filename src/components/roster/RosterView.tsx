@@ -14,7 +14,7 @@ import {
   Table as TableIcon,
   Plus,
 } from 'lucide-react';
-import { Adventurer, RecruitCandidate } from '../../types/savegame';
+import { Adventurer, RecruitCandidate, EquipmentItem } from '../../types/savegame';
 import { HeroCard } from './HeroCard';
 import { HeroModal } from './HeroModal';
 import { RosterTableView } from './RosterTableView';
@@ -27,6 +27,7 @@ import { useTranslation } from '../../lib/i18n';
 interface RosterViewProps {
   roster: Adventurer[];
   recruits?: RecruitCandidate[];
+  stash?: EquipmentItem[];
   onChange: (updatedRoster: Adventurer[]) => void;
   onChangeRecruits?: (updatedRecruits: RecruitCandidate[]) => void;
   currentDay?: number;
@@ -36,6 +37,7 @@ interface RosterViewProps {
 export const RosterView: React.FC<RosterViewProps> = ({
   roster,
   recruits = [],
+  stash = [],
   onChange,
   onChangeRecruits,
   currentDay = 1,
@@ -496,6 +498,7 @@ export const RosterView: React.FC<RosterViewProps> = ({
           hero={modalHero}
           isOpen={!!modalHero}
           initialTab={modalTab}
+          stash={stash}
           onClose={() => {
             setModalHero(null);
             setEditingRecruitIndex(null);
